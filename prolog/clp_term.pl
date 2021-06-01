@@ -340,35 +340,31 @@ terms_dom_intersection(Dom1, Dom2, Intersection) :-
   -> Intersection = NewDom2
   ;  NewDom2 = all_terms
   -> Intersection = NewDom1
-  ;  NewDom1 = terms_from(X), NewDom2 = singleton(Y)
-  -> (  X = const(X1), Y = const(Y1), X1 @=< Y1 
-     -> Intersection = singleton(Y)
-     ;  ( Intersection = singleton(Y) ; Intersection = empty )
-     )
-  ;  NewDom1 = terms_to(X), NewDom2 = singleton(Y)
-  -> (  X = const(X1), Y = const(Y1), X1 @>= Y1
-     -> Intersection = singleton(Y)
-     ;  ( Intersection = singleton(Y) ; Intersection = empty )
-     )
-  ;  NewDom1 = [X, Y], NewDom2 = singleton(Z)
-  -> (  X = const(X1), Y = const(Y1), Z = const(Z1), X1 @=< Z1, Z1 @=< Y1
-     -> Intersection = singleton(Z)
-     ;  ( Intersection = singleton(Z) ; Intersection = empty ) 
-     )
-  ;  NewDom1 = singleton(X), NewDom2 = singleton(Y)
-  -> (  X = const(X1), Y = const(Y1), X1 = Y1
-     -> Intersection = singleton(X)
-     ;  X = const(X1), Y = variable(Y1)
-     -> ( Intersection = singleton(X), X1 = Y1
-        ; Intersection = empty 
+  ;  NewDom2 = singleton(Y) % handle case when second domain is singleton
+  -> (  NewDom1 = terms_from(X)
+     -> (  X = const(X1), Y = const(Y1), X1 @=< Y1 
+        -> Intersection = singleton(Y)
+        ;  ( Intersection = singleton(Y) ; Intersection = empty )
         )
-     ;  X = variable(X1), Y = const(Y1)
-     -> ( Intersection = singleton(Y), X1 = Y1 
-        ; Intersection = empty 
+     ;  NewDom1 = terms_to(X)
+     -> (  X = const(X1), Y = const(Y1), X1 @>= Y1
+        -> Intersection = singleton(Y)
+        ;  ( Intersection = singleton(Y) ; Intersection = empty )
         )
-     ;  X = variable(X1), Y = variable(Y1)
-     -> (  Intersection = singleton(X), X1 = Y1 
-        ;  Intersection = empty 
+     ;  NewDom1 = [X, Z]
+     -> (  X = const(X1), Z = const(Z1), Y = const(Y1), X1 @=< Y1, Y1 @=< Z1
+        -> Intersection = singleton(Y)
+        ;  ( Intersection = singleton(Y) ; Intersection = empty ) 
+        )
+     ;  NewDom1 = singleton(X)
+     -> (  X = const(X1), Y = const(Y1), X1 = Y1
+        -> Intersection = singleton(X)
+        ;  X = const(X1), Y = variable(Y1)
+        -> ( Intersection = singleton(X), X1 = Y1 ; Intersection = empty )
+        ;  X = variable(X1), Y = const(Y1)
+        -> ( Intersection = singleton(Y), X1 = Y1 ; Intersection = empty )
+        ;  X = variable(X1), Y = variable(Y1)
+        -> (  Intersection = singleton(X), X1 = Y1 ; Intersection = empty )
         )
      )
   ;  NewDom1 = singleton(_), member(NewDom2, [terms_from(_), terms_to(_), [_,_]])
