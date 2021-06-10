@@ -1325,7 +1325,7 @@ test('unify_termsfrom_termsfrom_c_v', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected)), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_from_from(Dom1, Dom2, Expected)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -1334,7 +1334,7 @@ test('unify_termsfrom_termsfrom_v_c', [ fail ]) :-
   term_at_least(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, terms_intersection(Dom1, Dom2, Expected), Expecteds),
+  setof(X-Y-Expected, terms_intersection_from_from(Dom1, Dom2, Expected), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -1343,7 +1343,7 @@ test('unify_termsfrom_termsfrom_v_v', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, terms_intersection(Dom1, Dom2, Expected), Expecteds),
+  setof(X-Y-Expected, terms_intersection_from_from(Dom1, Dom2, Expected), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -1358,7 +1358,7 @@ test('unify_termsfrom_termsto_c_v', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (terms_intersection_from_to(Dom1, Dom2, Expected),
                    \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   Expecteds = [_-_-Es], Actuals = [_-_-As],
@@ -1369,7 +1369,7 @@ test('unify_termsfrom_termsto_c_v_singleton', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_from_to(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1378,7 +1378,7 @@ test('unify_termsfrom_termsto_v_c', [ fail ]) :-
   term_at_most(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (terms_intersection_from_to(Dom1, Dom2, Expected),
         \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -1388,7 +1388,7 @@ test('unify_termsfrom_termsto_v_c_singleton', [ fail ]) :-
   term_at_most(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_from_to(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1397,7 +1397,7 @@ test('unify_termsfrom_termsto_v_v', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (terms_intersection_from_to(Dom1, Dom2, Expected),
         \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -1407,7 +1407,7 @@ test('unify_termsfrom_termsto_v_v_singleton', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_from_to(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1422,7 +1422,7 @@ test('unify_termsfrom_int_c_[c,v]', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (terms_intersection_from_int(Dom1, Dom2, Expected),
                        \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   Expecteds = [_-_-Es], Actuals = [_-_-As],
@@ -1433,7 +1433,7 @@ test('unify_termsfrom_int_c_[c,v]_singleton', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_from_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1442,7 +1442,7 @@ test('unify_termsfrom_int_c_[v,c]', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, terms_intersection(Dom1, Dom2, Expected), Expecteds),
+  setof(X-Y-Expected, terms_intersection_from_int(Dom1, Dom2, Expected), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1451,7 +1451,7 @@ test('unify_termsfrom_int_c_[v,v]', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (terms_intersection_from_int(Dom1, Dom2, Expected),
                        \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   Expecteds = [_-_-Es1, _-_-Es2], Actuals = [_-_-As1, _-_-As2],
@@ -1462,7 +1462,7 @@ test('unify_termsfrom_int_c_[v,v]_singleton', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_from_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1471,7 +1471,7 @@ test('unify_termsfrom_int_v_[c,c]', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (terms_intersection_from_int(Dom1, Dom2, Expected),
         \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -1481,7 +1481,7 @@ test('unify_termsfrom_int_v_[c,c]_singleton', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_from_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1490,7 +1490,8 @@ test('unify_termsfrom_int_v_[c,v]', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_from_int(Dom1, Dom2, Expected), 
+        \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1499,7 +1500,7 @@ test('unify_termsfrom_int_v_[c,v]_singleton', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_from_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1508,7 +1509,7 @@ test('unify_termsfrom_int_v_[v,c]', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_from_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1517,7 +1518,7 @@ test('unify_termsfrom_int_v_[v,c]_singleton', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_from_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1526,7 +1527,7 @@ test('unify_termsfrom_int_v_[v,v]', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (terms_intersection_from_int(Dom1, Dom2, Expected),
                    \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -1536,7 +1537,7 @@ test('unify_termsfrom_int_v_[v,v]_singleton', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_from_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1551,7 +1552,7 @@ test('unify_termsto_termsfrom_c_c', [ fail ]) :-
   term_at_least(Y, 1),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected)), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_to_int(Dom1, Dom2, Expected)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1560,7 +1561,7 @@ test('unify_termsto_termsfrom_c_v', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_to_from(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1569,7 +1570,7 @@ test('unify_termsto_termsfrom_c_v_singleton', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_to_from(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1578,7 +1579,7 @@ test('unify_termsto_termsfrom_v_c', [ fail ]) :-
   term_at_least(Y, 1),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_to_from(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   Expecteds = [_-_-Es], Actuals = [_-_-As],
   \+ Es = As.
@@ -1588,7 +1589,7 @@ test('unify_termsto_termsfrom_v_c_singleton', [ fail ]) :-
   term_at_least(Y, 1),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_to_from(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1597,7 +1598,7 @@ test('unify_termsto_termsfrom_v_v', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_to_from(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1606,7 +1607,7 @@ test('unify_termsto_termsfrom_v_v_singleton', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_to_from(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1615,7 +1616,7 @@ test('unify_termsto_termsto_c_c', [ fail ]) :-
   term_at_most(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected)), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_to_to(Dom1, Dom2, Expected)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1624,7 +1625,7 @@ test('unify_termsto_termsto_c_v', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, terms_intersection(Dom1, Dom2, Expected), Expecteds),
+  setof(X-Y-Expected, terms_intersection_to_to(Dom1, Dom2, Expected), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -1633,7 +1634,7 @@ test('unify_termsto_termsto_v_c', [ fail ]) :-
   term_at_most(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, terms_intersection(Dom1, Dom2, Expected), Expecteds),
+  setof(X-Y-Expected, terms_intersection_to_to(Dom1, Dom2, Expected), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -1642,7 +1643,7 @@ test('unify_termsto_termsto_v_v', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, terms_intersection(Dom1, Dom2, Expected), Expecteds),
+  setof(X-Y-Expected, terms_intersection_to_to(Dom1, Dom2, Expected), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1651,7 +1652,7 @@ test('unify_termsto_int_c_[c,c]', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, terms_intersection(Dom1, Dom2, Expected), Expecteds),
+  setof(X-Y-Expected, terms_intersection_to_int(Dom1, Dom2, Expected), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1660,7 +1661,7 @@ test('unify_termsto_int_c_[c,v]', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, terms_intersection(Dom1, Dom2, Expected), Expecteds),
+  setof(X-Y-Expected, terms_intersection_to_int(Dom1, Dom2, Expected), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1669,7 +1670,7 @@ test('unify_termsto_int_c_[v,c]', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2), Dom2 = [_,_],
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_to_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1678,24 +1679,26 @@ test('unify_termsto_int_c_[v,c]_singleton', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2), Dom2 = [_,_],
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_to_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
 test('unify_termsto_int_c_[v,v]', [ fail ]) :-
-  term_at_most(X, 2), term_at_least(Y, _), term_at_most(Y, _),
+  term_at_most(X, 2), 
+  term_at_least(Y, _), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (terms_intersection_to_int(Dom1, Dom2, Expected),
                        \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
 test('unify_termsto_int_c_[v,v]_singleton', [ fail ]) :-
-  term_at_most(X, 2), term_at_least(Y, _), term_at_most(Y, _),
+  term_at_most(X, 2), 
+  term_at_least(Y, _), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2), Dom2 = [_,_],
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_to_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1704,7 +1707,7 @@ test('unify_termsto_int_v_[c,c]', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_to_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1713,7 +1716,7 @@ test('unify_termsto_int_v_[c,c]_singleton', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_to_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1722,7 +1725,7 @@ test('unify_termsto_int_v_[c,v]', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_to_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1731,7 +1734,7 @@ test('unify_termsto_int_v_[c,v]_singleton', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_to_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1740,7 +1743,7 @@ test('unify_termsto_int_v_[v,c]', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (terms_intersection_to_int(Dom1, Dom2, Expected),
                        \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -1750,7 +1753,7 @@ test('unify_termsto_int_v_[v,c]_singleton', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_to_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1759,7 +1762,7 @@ test('unify_termsto_int_v_[v,v]', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (terms_intersection_to_int(Dom1, Dom2, Expected),
                        \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -1769,7 +1772,7 @@ test('unify_termsto_int_v_[v,v]_singleton', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_to_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1823,7 +1826,7 @@ test('unify_int_termsfrom_[c,c]_v', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_from(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1832,7 +1835,7 @@ test('unify_int_termsfrom_[c,c]_v_singleton', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_int_from(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1841,7 +1844,7 @@ test('unify_int_termsfrom_[c,v]_c', [ fail ]) :-
   term_at_least(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_from(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   Expecteds = [_-_-Es], Actuals = [_-_-As],
   \+ Es = As.
@@ -1851,7 +1854,7 @@ test('unify_int_termsfrom_[c,v]_c_singleton', [ fail ]) :-
   term_at_least(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_int_from(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1860,7 +1863,7 @@ test('unify_int_termsfrom_[c,v]_v', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (terms_intersection_int_from(Dom1, Dom2, Expected),
                    \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -1870,7 +1873,7 @@ test('unify_int_termsfrom_[c,v]_v_singleton', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_int_from(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1879,7 +1882,7 @@ test('unify_int_termsfrom_[v,c]_c', [ fail ]) :-
   term_at_least(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, terms_intersection(Dom1, Dom2, Expected), Expecteds),
+  setof(X-Y-Expected, terms_intersection_int_from(Dom1, Dom2, Expected), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1888,7 +1891,7 @@ test('unify_int_termsfrom_[v,c]_v', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_from(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1897,7 +1900,7 @@ test('unify_int_termsfrom_[v,c]_v_singleton', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_int_from(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1906,7 +1909,7 @@ test('unify_int_termsfrom_[v,v]_c', [ fail ]) :-
   term_at_least(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_from(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1915,7 +1918,7 @@ test('unify_int_termsfrom_[v,v]_c_singleton', [ fail ]) :-
   term_at_least(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_int_from(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1924,7 +1927,7 @@ test('unify_int_termsfrom_[v,v]_v', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (terms_intersection_int_from(Dom1, Dom2, Expected),
                        \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -1934,7 +1937,7 @@ test('unify_int_termsfrom_[v,v]_v_singleton', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_int_from(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1943,7 +1946,7 @@ test('unify_int_termsto_[c,c]_c', [ fail ]) :-
   term_at_most(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected)), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_to(Dom1, Dom2, Expected)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1952,7 +1955,7 @@ test('unify_int_termsto_[c,c]_v', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_to(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1961,7 +1964,7 @@ test('unify_int_termsto_[c,c]_v_singleton', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_int_to(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1970,7 +1973,7 @@ test('unify_int_termsto_[c,v]_c', [ fail ]) :-
   term_at_most(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, terms_intersection(Dom1, Dom2, Expected), Expecteds),
+  setof(X-Y-Expected, terms_intersection_int_to(Dom1, Dom2, Expected), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1979,7 +1982,7 @@ test('unify_int_termsto_[c,v]_v', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_to(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1988,7 +1991,7 @@ test('unify_int_termsto_[c,v]_v_singleton', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_int_to(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1997,7 +2000,7 @@ test('unify_int_termsto_[v,c]_c', [ fail ]) :-
   term_at_most(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_to(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -2006,7 +2009,7 @@ test('unify_int_termsto_[v,c]_c_singleton', [ fail ]) :-
   term_at_most(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_int_to(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -2015,7 +2018,7 @@ test('unify_int_termsto_[v,c]_v', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (terms_intersection_int_to(Dom1, Dom2, Expected),
                    \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -2025,7 +2028,7 @@ test('unify_int_termsto_[v,c]_v_singleton', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_int_to(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -2034,7 +2037,7 @@ test('unify_int_termsto_[v,v]_c', [ fail ]) :-
   term_at_most(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_to(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -2043,7 +2046,7 @@ test('unify_int_termsto_[v,v]_c_singleton', [ fail ]) :-
   term_at_most(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_int_to(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -2052,7 +2055,7 @@ test('unify_int_termsto_[v,v]_v', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (terms_intersection_int_to(Dom1, Dom2, Expected),
                    \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -2062,7 +2065,7 @@ test('unify_int_termsto_[v,v]_v_singleton', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)),
+  terms_intersection_int_to(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -2076,7 +2079,7 @@ test('unify_int_int_[c,c]_[c,v]', [ fail ]) :-
   term_at_least(X, 1), term_at_most(X, 3),
   term_at_least(Y, 2), term_at_most(Y, _),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, terms_intersection(Dom1, Dom2, Expected), Expecteds),
+  setof(X-Y-Expected, terms_intersection_int_int(Dom1, Dom2, Expected), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2084,7 +2087,7 @@ test('unify_int_int_[c,c]_[v,c]', [ fail ]) :-
   term_at_least(X, 1), term_at_most(X, 3),
   term_at_least(Y, _), term_at_most(Y, 4),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2092,7 +2095,7 @@ test('unify_int_int_[c,c]_[v,v]', [ fail ]) :-
   term_at_least(X, 1), term_at_most(X, 3),
   term_at_least(Y, _), term_at_most(Y, _),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2100,7 +2103,7 @@ test('unify_int_int_[c,v]_[c,c]', [ fail ]) :-
   term_at_least(X, 1), term_at_most(X, _),
   term_at_least(Y, 2), term_at_most(Y, 4),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2108,7 +2111,7 @@ test('unify_int_int_[c,v]_[c,v]', [ fail ]) :-
   term_at_least(X, 1), term_at_most(X, _),
   term_at_least(Y, 2), term_at_most(Y, _),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2116,7 +2119,7 @@ test('unify_int_int_[c,v]_[v,c]', [ fail ]) :-
   term_at_least(X, 1), term_at_most(X, _),
   term_at_least(Y, _), term_at_most(Y, 4),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2124,7 +2127,7 @@ test('unify_int_int_[c,v]_[v,v]', [ fail ]) :-
   term_at_least(X, 1), term_at_most(X, _),
   term_at_least(Y, _), term_at_most(Y, 4),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2132,7 +2135,7 @@ test('unify_int_int_[v,c]_[c,c]', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, 3),
   term_at_least(Y, 2), term_at_most(Y, 4),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2140,7 +2143,7 @@ test('unify_int_int_[v,c]_[c,v]', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, 3),
   term_at_least(Y, 2), term_at_most(Y, _),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2148,7 +2151,7 @@ test('unify_int_int_[v,c]_[v,c]', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, 3),
   term_at_least(Y, _), term_at_most(Y, 4),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2156,7 +2159,7 @@ test('unify_int_int_[v,c]_[v,v]', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, 3),
   term_at_least(Y, _), term_at_most(Y, _),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2164,7 +2167,7 @@ test('unify_int_int_[v,v]_[c,c]', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, _),
   term_at_least(Y, 2), term_at_most(Y, 4),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2172,7 +2175,7 @@ test('unify_int_int_[v,v]_[c,v]', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, _),
   term_at_least(Y, 2), term_at_most(Y, _),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2180,7 +2183,7 @@ test('unify_int_int_[v,v]_[v,c]', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, _),
   term_at_least(Y, _), term_at_most(Y, 4),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2188,7 +2191,7 @@ test('unify_int_int_[v,v]_[v,v]', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, _),
   term_at_least(Y, _), term_at_most(Y, _),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
