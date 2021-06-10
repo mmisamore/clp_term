@@ -1,19 +1,6 @@
 :- module(clp_term,
-  [ term_indomain/2,
-    is_term/1,
-    term_at_least/2,
+  [ term_at_least/2,
     term_at_most/2,
-    terms_intersection_from_from/3,
-    terms_intersection_to_to/3,
-    terms_intersection_from_to/3,
-    terms_intersection_to_from/3,
-    terms_intersection_from_int/3,
-    terms_intersection_int_from/3,
-    terms_intersection_to_int/3,
-    terms_intersection_int_to/3,
-    terms_intersection_int_int/3,
-    term_normalized/2,
-    dom_normalized/2,
     terms_dom_intersection/3,
     attr_unify_hook/2,
     attribute_termorder_goals/3,
@@ -26,8 +13,8 @@
 % True whenever the term `Term` belongs to the term order domain `Dom`. If `Term` is already 
 % constrained in the standard ordering of terms it is unified with this new constraint.
 term_indomain(Term, Dom) :-
-  (  nonvar(Term) % don't support Term enumeration 
-  -> fail         % TODO: turn this into an uninstantiation error 
+  (  nonvar(Term)
+  -> throw(error(uninstantiation_error(Term), "Term enumeration is not supported by term_indomain/2"))
   ;  var(Dom)
   -> get_attr(Term, term_order, Dom)
   ;  (  get_attr(Term, term_order, Dom1) % already attributed?
@@ -77,7 +64,7 @@ term_at_most(Term, Y) :-
 % behavior when variable endpoints are grounded. 
 term_normalized(Term0, Term) :-
   (  var(Term0)
-  -> fail % turn this into an instantiation error
+  -> throw(error(instantiation_error(Term0), "Normalizing uninstantiated terms is not supported in term_normalized/2"))
   ;  Term0 = variable(X)
   -> (  nonvar(X)
      -> Term = const(X)

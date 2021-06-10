@@ -2,42 +2,41 @@
 
 :- begin_tests(clp_term).
 
-
 % Tests for term_indomain/2
-test('term_indomain_+_+_fails', [ fail ]) :-
-  term_indomain(1, all_terms).
+test('term_indomain_+_+_fails', [ throws(error(uninstantiation_error(1), _)) ]) :-
+  clp_term:term_indomain(1, all_terms).
 
-test('term_indomain_+_-_fails', [ fail ]) :-
-  term_indomain(1, _).
+test('term_indomain_+_-_fails', [ throws(error(uninstantiation_error(1), _)) ]) :-
+  clp_term:term_indomain(1, _).
 
 test('term_indomain_-_+_succeeds') :-
-  term_indomain(Term, all_terms),
+  clp_term:term_indomain(Term, all_terms),
   get_attr(Term, term_order, all_terms).
 
 test('term_indomain_-_+_put_twice_unifies', [ fail ]) :-
-  term_indomain(Term, terms_from(const(1))),
-  term_indomain(Term, terms_to(const(2))),
+  clp_term:term_indomain(Term, terms_from(const(1))),
+  clp_term:term_indomain(Term, terms_to(const(2))),
   \+ get_attr(Term, term_order, [const(1), const(2)]).
 
 test('term_indomain_-_-_succeeds') :-
   put_attr(Term, term_order, all_terms),
-  term_indomain(Term, Dom),
+  clp_term:term_indomain(Term, Dom),
   Dom == all_terms.
 
 test('term_indomain_-_-_put_get') :-
-  term_indomain(Term, all_terms),
-  term_indomain(Term, Dom),
+  clp_term:term_indomain(Term, all_terms),
+  clp_term:term_indomain(Term, Dom),
   Dom == all_terms.
 
 
 % Tests for is_term/1
 test('is_term_-_get') :-
-  is_term(Term),
+  clp_term:is_term(Term),
   get_attr(Term, term_order, all_terms).
 
 test('is_term_-_already_constrained') :-
-  term_indomain(Term, terms_from(const(42))),
-  is_term(Term),
+  clp_term:term_indomain(Term, terms_from(const(42))),
+  clp_term:is_term(Term),
   get_attr(Term, term_order, terms_from(const(42))).
 
 
@@ -71,279 +70,279 @@ test('term_at_most_-_+_already_constrained', [ fail ]) :-
 
 % Tests for term_normalized/2
 test('term_normalized_c_c') :-
-  term_normalized(const(a), const(a)).
+  clp_term:term_normalized(const(a), const(a)).
 
 test('term_normalized_c_-') :-
-  term_normalized(const(a), Term),
+  clp_term:term_normalized(const(a), Term),
   Term == const(a).
 
 test('term_normalized_v_c') :-
   X = a,
-  term_normalized(variable(X), const(a)).
+  clp_term:term_normalized(variable(X), const(a)).
 
 test('term_normalized_v_-') :-
   X = a,
-  term_normalized(variable(X), Term),
+  clp_term:term_normalized(variable(X), Term),
   Term == const(a).
 
 test('term_normalized_v_v') :-
-  term_normalized(variable(X), variable(X)).
+  clp_term:term_normalized(variable(X), variable(X)).
 
 test('term_normalized_v_v_-') :-
-  term_normalized(variable(X), Term),
+  clp_term:term_normalized(variable(X), Term),
   Term == variable(X).
 
-test('term_normalized_uninst_const_-_+', [ fail ]) :-
-  term_normalized(_, const(a)).
+test('term_normalized_uninst_const_-_+', [ throws(error(instantiation_error(X), _)) ]) :-
+  clp_term:term_normalized(X, const(a)).
 
-test('term_normalized_uninst_var_-_+', [ fail ]) :-
-  term_normalized(_, variable(_)).
+test('term_normalized_uninst_var_-_+', [ throws(error(instantiation_error(X), _)) ]) :-
+  clp_term:term_normalized(X, variable(_)).
 
-test('term_normalized_uninst_-_-', [ fail ]) :-
-  term_normalized(_, _).
+test('term_normalized_uninst_-_-', [ throws(error(instantiation_error(X), _)) ]) :-
+  clp_term:term_normalized(X, _).
 
 test('term_normalized_naked_const_+_+', [ fail ]) :-
-  term_normalized(a, a).
+  clp_term:term_normalized(a, a).
 
 test('term_normalized_unknown_functor_1st_+_+', [ fail ]) :-
-  term_normalized(foo(_), variable(_)).
+  clp_term:term_normalized(foo(_), variable(_)).
 
 test('term_normalized_unknown_functor_2nd_+_+', [ fail ]) :-
-  term_normalized(variable(_), foo(_)).
+  clp_term:term_normalized(variable(_), foo(_)).
 
 test('term_normalized_unknown_functor_1st_+_-', [ fail ]) :-
-  term_normalized(foo(_), Y),
+  clp_term:term_normalized(foo(_), Y),
   Y = variable(_).
 
 test('term_normalized_unknown_functor_2nd_+_-', [ fail ]) :-
-  term_normalized(variable(_), Y),
+  clp_term:term_normalized(variable(_), Y),
   Y = foo(_).
 
 test('term_normalized_naked_const_+_-', [ fail ]) :-
-  term_normalized(a, _).
+  clp_term:term_normalized(a, _).
 
 
 % Tests for dom_normalized/2
 test('dom_normalized_empty_empty_+_+') :-
-  dom_normalized(empty, empty).
+  clp_term:dom_normalized(empty, empty).
 
 test('dom_normalized_empty_empty_+_-') :-
-  dom_normalized(empty, Dom),
+  clp_term:dom_normalized(empty, Dom),
   Dom == empty.
 
 test('dom_normalized_all_terms_+_+') :-
-  dom_normalized(all_terms, all_terms).
+  clp_term:dom_normalized(all_terms, all_terms).
 
 test('dom_normalized_all_terms_+_-') :-
-  dom_normalized(all_terms, Dom),
+  clp_term:dom_normalized(all_terms, Dom),
   Dom == all_terms.
 
 test('dom_normalized_terms_from_+_+_c') :-
   Term0 = const(a),
-  term_normalized(Term0, Term),
-  dom_normalized(terms_from(Term0), terms_from(Term)).
+  clp_term:term_normalized(Term0, Term),
+  clp_term:dom_normalized(terms_from(Term0), terms_from(Term)).
 
 test('dom_normalized_terms_from_+_+_v') :-
   Term0 = variable(_),
-  term_normalized(Term0, Term),
-  dom_normalized(terms_from(Term0), terms_from(Term)).
+  clp_term:term_normalized(Term0, Term),
+  clp_term:dom_normalized(terms_from(Term0), terms_from(Term)).
 
 test('dom_normalized_terms_from_+_+_v_to_c') :-
   X = a,
   Term0 = variable(X),
-  term_normalized(Term0, Term),
-  dom_normalized(terms_from(Term0), terms_from(Term)).
+  clp_term:term_normalized(Term0, Term),
+  clp_term:dom_normalized(terms_from(Term0), terms_from(Term)).
 
 test('dom_normalized_terms_from_+_-_c') :-
   Term0 = const(a),
-  term_normalized(Term0, Term),
-  dom_normalized(terms_from(Term0), Dom),
+  clp_term:term_normalized(Term0, Term),
+  clp_term:dom_normalized(terms_from(Term0), Dom),
   Dom == terms_from(Term).
 
 test('dom_normalized_terms_from_+_-_v') :-
   Term0 = variable(_),
-  term_normalized(Term0, Term),
-  dom_normalized(terms_from(Term0), Dom),
+  clp_term:term_normalized(Term0, Term),
+  clp_term:dom_normalized(terms_from(Term0), Dom),
   Dom == terms_from(Term).
 
 test('dom_normalized_terms_from_+_-_v_to_c') :-
   X = a,
   Term0 = variable(X),
-  term_normalized(Term0, Term),
-  dom_normalized(terms_from(Term0), Dom),
+  clp_term:term_normalized(Term0, Term),
+  clp_term:dom_normalized(terms_from(Term0), Dom),
   Dom == terms_from(Term).
 
 test('dom_normalized_terms_to_+_+_c') :-
   Term0 = const(a),
-  term_normalized(Term0, Term),
-  dom_normalized(terms_to(Term0), terms_to(Term)).
+  clp_term:term_normalized(Term0, Term),
+  clp_term:dom_normalized(terms_to(Term0), terms_to(Term)).
 
 test('dom_normalized_terms_to_+_+_v') :-
   Term0 = variable(_),
-  term_normalized(Term0, Term),
-  dom_normalized(terms_to(Term0), terms_to(Term)).
+  clp_term:term_normalized(Term0, Term),
+  clp_term:dom_normalized(terms_to(Term0), terms_to(Term)).
 
 test('dom_normalized_terms_to_+_+_v_to_c') :-
   X = a,
   Term0 = variable(X),
-  term_normalized(Term0, Term),
-  dom_normalized(terms_to(Term0), terms_to(Term)).
+  clp_term:term_normalized(Term0, Term),
+  clp_term:dom_normalized(terms_to(Term0), terms_to(Term)).
 
 test('dom_normalized_terms_to_+_-_c') :-
   Term0 = const(a),
-  term_normalized(Term0, Term),
-  dom_normalized(terms_to(Term0), Dom),
+  clp_term:term_normalized(Term0, Term),
+  clp_term:dom_normalized(terms_to(Term0), Dom),
   Dom == terms_to(Term).
 
 test('dom_normalized_terms_to_+_-_v') :-
   Term0 = variable(_),
-  term_normalized(Term0, Term),
-  dom_normalized(terms_to(Term0), Dom),
+  clp_term:term_normalized(Term0, Term),
+  clp_term:dom_normalized(terms_to(Term0), Dom),
   Dom == terms_to(Term).
 
 test('dom_normalized_terms_to_+_-_v_to_c') :-
   X = a,
   Term0 = variable(X),
-  term_normalized(Term0, Term),
-  dom_normalized(terms_to(Term0), Dom),
+  clp_term:term_normalized(Term0, Term),
+  clp_term:dom_normalized(terms_to(Term0), Dom),
   Dom == terms_to(Term).
 
 test('dom_normalized_singleton_+_+_c') :-
   Term0 = const(a),
-  term_normalized(Term0, Term),
-  dom_normalized(singleton(Term0), singleton(Term)).
+  clp_term:term_normalized(Term0, Term),
+  clp_term:dom_normalized(singleton(Term0), singleton(Term)).
 
 test('dom_normalized_singleton_+_+_v') :-
   Term0 = variable(_),
-  term_normalized(Term0, Term),
-  dom_normalized(singleton(Term0), singleton(Term)).
+  clp_term:term_normalized(Term0, Term),
+  clp_term:dom_normalized(singleton(Term0), singleton(Term)).
 
 test('dom_normalized_singleton_+_+_v_to_c') :-
   X = a,
   Term0 = variable(X),
-  term_normalized(Term0, Term),
-  dom_normalized(singleton(Term0), singleton(Term)).
+  clp_term:term_normalized(Term0, Term),
+  clp_term:dom_normalized(singleton(Term0), singleton(Term)).
 
 test('dom_normalized_singleton_+_-_c') :-
   Term0 = const(a),
-  term_normalized(Term0, Term),
-  dom_normalized(singleton(Term0), Dom),
+  clp_term:term_normalized(Term0, Term),
+  clp_term:dom_normalized(singleton(Term0), Dom),
   Dom == singleton(Term).
 
 test('dom_normalized_singleton_+_-_v') :-
   Term0 = variable(_),
-  term_normalized(Term0, Term),
-  dom_normalized(singleton(Term0), Dom),
+  clp_term:term_normalized(Term0, Term),
+  clp_term:dom_normalized(singleton(Term0), Dom),
   Dom == singleton(Term).
 
 test('dom_normalized_singleton_+_-_v_to_c') :-
   X = a,
   Term0 = variable(X),
-  term_normalized(Term0, Term),
-  dom_normalized(singleton(Term0), Dom),
+  clp_term:term_normalized(Term0, Term),
+  clp_term:dom_normalized(singleton(Term0), Dom),
   Dom == singleton(Term).
 
 test('dom_normalized_interval_+_+_c_c') :-
   TermX0 = const(a),
   TermY0 = const(b),
-  term_normalized(TermX0, TermX),
-  term_normalized(TermY0, TermY),
-  dom_normalized([TermX0, TermY0], [TermX, TermY]).
+  clp_term:term_normalized(TermX0, TermX),
+  clp_term:term_normalized(TermY0, TermY),
+  clp_term:dom_normalized([TermX0, TermY0], [TermX, TermY]).
 
 test('dom_normalized_interval_+_+_c_v') :-
   TermX0 = const(a),
   TermY0 = variable(_),
-  term_normalized(TermX0, TermX),
-  term_normalized(TermY0, TermY),
-  dom_normalized([TermX0, TermY0], [TermX, TermY]).
+  clp_term:term_normalized(TermX0, TermX),
+  clp_term:term_normalized(TermY0, TermY),
+  clp_term:dom_normalized([TermX0, TermY0], [TermX, TermY]).
 
 test('dom_normalized_interval_+_+_v_c') :-
   TermX0 = variable(_),
   TermY0 = const(b),
-  term_normalized(TermX0, TermX),
-  term_normalized(TermY0, TermY),
-  dom_normalized([TermX0, TermY0], [TermX, TermY]).
+  clp_term:term_normalized(TermX0, TermX),
+  clp_term:term_normalized(TermY0, TermY),
+  clp_term:dom_normalized([TermX0, TermY0], [TermX, TermY]).
 
 test('dom_normalized_interval_+_+_v_v') :-
   TermX0 = variable(_),
   TermY0 = variable(_),
-  term_normalized(TermX0, TermX),
-  term_normalized(TermY0, TermY),
-  dom_normalized([TermX0, TermY0], [TermX, TermY]).
+  clp_term:term_normalized(TermX0, TermX),
+  clp_term:term_normalized(TermY0, TermY),
+  clp_term:dom_normalized([TermX0, TermY0], [TermX, TermY]).
 
 test('dom_normalized_interval_+_+_v_v2c') :-
   TermX0 = variable(_),
   TermY0 = variable(Y),
   Y = b,
-  term_normalized(TermX0, TermX),
-  term_normalized(TermY0, TermY),
-  dom_normalized([TermX0, TermY0], [TermX, TermY]).
+  clp_term:term_normalized(TermX0, TermX),
+  clp_term:term_normalized(TermY0, TermY),
+  clp_term:dom_normalized([TermX0, TermY0], [TermX, TermY]).
 
 test('dom_normalized_interval_+_+_v2c_v') :-
   TermX0 = variable(X),
   TermY0 = variable(_),
   X = a,
-  term_normalized(TermX0, TermX),
-  term_normalized(TermY0, TermY),
-  dom_normalized([TermX0, TermY0], [TermX, TermY]).
+  clp_term:term_normalized(TermX0, TermX),
+  clp_term:term_normalized(TermY0, TermY),
+  clp_term:dom_normalized([TermX0, TermY0], [TermX, TermY]).
 
 test('dom_normalized_interval_+_+_v2c_v2c') :-
   TermX0 = variable(X),
   TermY0 = variable(Y),
   X = a,
   Y = b,
-  term_normalized(TermX0, TermX),
-  term_normalized(TermY0, TermY),
-  dom_normalized([TermX0, TermY0], [TermX, TermY]).
+  clp_term:term_normalized(TermX0, TermX),
+  clp_term:term_normalized(TermY0, TermY),
+  clp_term:dom_normalized([TermX0, TermY0], [TermX, TermY]).
 
 test('dom_normalized_interval_+_-_c_c') :-
   TermX0 = const(a),
   TermY0 = const(b),
-  term_normalized(TermX0, TermX),
-  term_normalized(TermY0, TermY),
-  dom_normalized([TermX0, TermY0], Dom),
+  clp_term:term_normalized(TermX0, TermX),
+  clp_term:term_normalized(TermY0, TermY),
+  clp_term:dom_normalized([TermX0, TermY0], Dom),
   Dom == [TermX, TermY].
 
 test('dom_normalized_interval_+_-_c_v') :-
   TermX0 = const(a),
   TermY0 = variable(_),
-  term_normalized(TermX0, TermX),
-  term_normalized(TermY0, TermY),
-  dom_normalized([TermX0, TermY0], Dom),
+  clp_term:term_normalized(TermX0, TermX),
+  clp_term:term_normalized(TermY0, TermY),
+  clp_term:dom_normalized([TermX0, TermY0], Dom),
   Dom == [TermX, TermY].
 
 test('dom_normalized_interval_+_-_v_c') :-
   TermX0 = variable(_),
   TermY0 = const(b),
-  term_normalized(TermX0, TermX),
-  term_normalized(TermY0, TermY),
-  dom_normalized([TermX0, TermY0], Dom),
+  clp_term:term_normalized(TermX0, TermX),
+  clp_term:term_normalized(TermY0, TermY),
+  clp_term:dom_normalized([TermX0, TermY0], Dom),
   Dom == [TermX, TermY].
 
 test('dom_normalized_interval_+_-_v_v') :-
   TermX0 = variable(_),
   TermY0 = variable(_),
-  term_normalized(TermX0, TermX),
-  term_normalized(TermY0, TermY),
-  dom_normalized([TermX0, TermY0], Dom),
+  clp_term:term_normalized(TermX0, TermX),
+  clp_term:term_normalized(TermY0, TermY),
+  clp_term:dom_normalized([TermX0, TermY0], Dom),
   Dom == [TermX, TermY].
 
 test('dom_normalized_interval_+_-_v_v2c') :-
   TermX0 = variable(_),
   TermY0 = variable(Y),
   Y = b,
-  term_normalized(TermX0, TermX),
-  term_normalized(TermY0, TermY),
-  dom_normalized([TermX0, TermY0], Dom),
+  clp_term:term_normalized(TermX0, TermX),
+  clp_term:term_normalized(TermY0, TermY),
+  clp_term:dom_normalized([TermX0, TermY0], Dom),
   Dom == [TermX, TermY].
 
 test('dom_normalized_interval_+_-_v2c_v') :-
   TermX0 = variable(X),
   TermY0 = variable(_),
   X = a,
-  term_normalized(TermX0, TermX),
-  term_normalized(TermY0, TermY),
-  dom_normalized([TermX0, TermY0], Dom),
+  clp_term:term_normalized(TermX0, TermX),
+  clp_term:term_normalized(TermY0, TermY),
+  clp_term:dom_normalized([TermX0, TermY0], Dom),
   Dom == [TermX, TermY].
 
 test('dom_normalized_interval_+_-_v2c_v2c') :-
@@ -351,174 +350,174 @@ test('dom_normalized_interval_+_-_v2c_v2c') :-
   TermY0 = variable(Y),
   X = a,
   Y = b,
-  term_normalized(TermX0, TermX),
-  term_normalized(TermY0, TermY),
-  dom_normalized([TermX0, TermY0], Dom),
+  clp_term:term_normalized(TermX0, TermX),
+  clp_term:term_normalized(TermY0, TermY),
+  clp_term:dom_normalized([TermX0, TermY0], Dom),
   Dom == [TermX, TermY].
 
 test('dom_normalized_interval_+_+_c_c_sing') :-
-  dom_normalized([const(a), const(a)], singleton(const(a))).
+  clp_term:dom_normalized([const(a), const(a)], singleton(const(a))).
 
 test('dom_normalized_interval_+_+_c_v2c_sing') :-
   Y = a,
-  dom_normalized([const(a), variable(Y)], singleton(const(a))).
+  clp_term:dom_normalized([const(a), variable(Y)], singleton(const(a))).
 
 test('dom_normalized_interval_+_+_v2c_c_sing') :-
   X = a,
-  dom_normalized([variable(X), const(a)], singleton(const(a))).
+  clp_term:dom_normalized([variable(X), const(a)], singleton(const(a))).
 
 test('dom_normalized_interval_+_+_v2c_v2c_sing') :-
   X = a, Y = a,
-  dom_normalized([variable(X), variable(Y)], singleton(const(a))).
+  clp_term:dom_normalized([variable(X), variable(Y)], singleton(const(a))).
 
 test('dom_normalized_interval_+_+_v_v_eq_sing') :-
   X = Y,
-  dom_normalized([variable(X), variable(Y)], singleton(variable(X))).
+  clp_term:dom_normalized([variable(X), variable(Y)], singleton(variable(X))).
 
 test('dom_normalized_interval_+_-_c_c_sing') :-
-  dom_normalized([const(a), const(a)], Dom),
+  clp_term:dom_normalized([const(a), const(a)], Dom),
   Dom = singleton(const(a)).
 
 test('dom_normalized_interval_+_-_c_v2c_sing') :-
   Y = a,
-  dom_normalized([const(a), variable(Y)], Dom),
+  clp_term:dom_normalized([const(a), variable(Y)], Dom),
   Dom = singleton(const(a)).
 
 test('dom_normalized_interval_+_-_v2c_c_sing') :-
   X = a,
-  dom_normalized([variable(X), const(a)], Dom),
+  clp_term:dom_normalized([variable(X), const(a)], Dom),
   Dom = singleton(const(a)).
 
 test('dom_normalized_interval_+_-_v2c_v2c_sing') :-
   X = a, Y = a,
-  dom_normalized([variable(X), variable(Y)], Dom),
+  clp_term:dom_normalized([variable(X), variable(Y)], Dom),
   Dom = singleton(const(a)).
 
 test('dom_normalized_interval_+_-_v_v_eq_sing') :-
   X = Y,
-  dom_normalized([variable(X), variable(Y)], Dom),
+  clp_term:dom_normalized([variable(X), variable(Y)], Dom),
   Dom = singleton(variable(X)).
 
 test('dom_normalized_+_+_unknown_functor_1st', [ fail ]) :-
   X = a,
-  dom_normalized(foo(variable(X)), terms_from(const(a))).
+  clp_term:dom_normalized(foo(variable(X)), terms_from(const(a))).
 
 test('dom_normalized_+_+_unknown_functor_2nd', [ fail ]) :-
   X = a,
-  dom_normalized(terms_from(variable(X)), foo(const(a))).
+  clp_term:dom_normalized(terms_from(variable(X)), foo(const(a))).
 
 test('dom_normalized_+_+_functors_dont_match', [ fail ]) :-
   X = a,
-  dom_normalized(terms_from(variable(X)), terms_to(const(a))).
+  clp_term:dom_normalized(terms_from(variable(X)), terms_to(const(a))).
 
-test('dom_normalized_+_+_uninstantiated_endpoint', [ fail ]) :-
-  dom_normalized(terms_from(_), terms_from(const(a))).
+test('dom_normalized_+_+_uninstantiated_endpoint', [ throws(error(instantiation_error(X), _)) ]) :-
+  clp_term:dom_normalized(terms_from(X), terms_from(const(a))).
 
 test('dom_normalized_-_+_uninstantiated_1st', [ fail ]) :-
-  dom_normalized(_, all_terms).
+  clp_term:dom_normalized(_, all_terms).
 
 test('dom_normalized_+_-_unknown_functor_1st', [ fail ]) :-
   X = a,
-  dom_normalized(foo(variable(X)), _).
+  clp_term:dom_normalized(foo(variable(X)), _).
 
 test('dom_normalized_+_-_unknown_functor_2nd', [ fail ]) :-
   X = a,
-  dom_normalized(terms_from(variable(X)), Y),
+  clp_term:dom_normalized(terms_from(variable(X)), Y),
   Y = foo(const(a)).
 
 test('dom_normalized_+_-_functors_dont_match', [ fail ]) :-
   X = a,
-  dom_normalized(terms_from(variable(X)), Y),
+  clp_term:dom_normalized(terms_from(variable(X)), Y),
   Y = terms_to(const(a)).
 
-test('dom_normalized_+_-_uninstantiated_endpoint', [ fail ]) :-
-  dom_normalized(terms_from(_), Y),
+test('dom_normalized_+_-_uninstantiated_endpoint', [ throws(error(instantiation_error(X), _)) ]) :-
+  clp_term:dom_normalized(terms_from(X), Y),
   Y = terms_from(const(a)).
 
 
 % Tests for terms_intersection_from_from/3
 test('terms_from_from_intersection_c_c_>=') :-
-  setof(I, terms_intersection_from_from(terms_from(const(y)), terms_from(const(x)), I), [terms_from(const(y))]).
+  setof(I, clp_term:terms_intersection_from_from(terms_from(const(y)), terms_from(const(x)), I), [terms_from(const(y))]).
 
 test('terms_from_from_intersection_c_c_<') :-
-  setof(I, terms_intersection_from_from(terms_from(const(x)), terms_from(const(y)), I), [terms_from(const(y))]).
+  setof(I, clp_term:terms_intersection_from_from(terms_from(const(x)), terms_from(const(y)), I), [terms_from(const(y))]).
 
 test('terms_from_from_intersection_c_v') :-
-  setof(Y-I, terms_intersection_from_from(terms_from(const(x)), terms_from(variable(Y)), I), Ans),
+  setof(Y-I, clp_term:terms_intersection_from_from(terms_from(const(x)), terms_from(variable(Y)), I), Ans),
   Ans = [Y-terms_from(variable(Y)), Y-terms_from(const(x))].
 
 test('terms_from_from_intersection_v_c') :-
-  setof(X-I, terms_intersection_from_from(terms_from(variable(X)), terms_from(const(y)), I), Ans),
+  setof(X-I, clp_term:terms_intersection_from_from(terms_from(variable(X)), terms_from(const(y)), I), Ans),
   Ans = [X-terms_from(const(y)), X-terms_from(variable(X))].
 
 test('terms_from_from_intersection_v_v') :-
-  setof(X-Y-I, terms_intersection_from_from(terms_from(variable(X)), terms_from(variable(Y)), I), Ans),
+  setof(X-Y-I, clp_term:terms_intersection_from_from(terms_from(variable(X)), terms_from(variable(Y)), I), Ans),
   Ans = [X-Y-terms_from(variable(X)), X-Y-terms_from(variable(Y))].
 
 
 % Tests for terms_intersection_to_to/3
 test('terms_to_to_intersection_c_c_>=') :-
-  setof(I, terms_intersection_to_to(terms_to(const(y)), terms_to(const(x)), I), [terms_to(const(x))]).
+  setof(I, clp_term:terms_intersection_to_to(terms_to(const(y)), terms_to(const(x)), I), [terms_to(const(x))]).
 
 test('terms_to_to_intersection_c_c_<') :-
-  setof(I, terms_intersection_to_to(terms_to(const(x)), terms_to(const(y)), I), [terms_to(const(x))]).
+  setof(I, clp_term:terms_intersection_to_to(terms_to(const(x)), terms_to(const(y)), I), [terms_to(const(x))]).
 
 test('terms_to_to_intersection_c_v') :-
-  setof(Y-I, terms_intersection_to_to(terms_to(const(x)), terms_to(variable(Y)), I), Ans),
+  setof(Y-I, clp_term:terms_intersection_to_to(terms_to(const(x)), terms_to(variable(Y)), I), Ans),
   Ans = [Y-terms_to(variable(Y)), Y-terms_to(const(x))].
 
 test('terms_to_to_intersection_v_c') :-
-  setof(X-I, terms_intersection_to_to(terms_to(variable(X)), terms_to(const(y)), I), Ans),
+  setof(X-I, clp_term:terms_intersection_to_to(terms_to(variable(X)), terms_to(const(y)), I), Ans),
   Ans = [X-terms_to(const(y)), X-terms_to(variable(X))].
 
 test('terms_to_to_intersection_v_v') :-
-  setof(X-Y-I, terms_intersection_to_to(terms_to(variable(X)), terms_to(variable(Y)), I), Ans),
+  setof(X-Y-I, clp_term:terms_intersection_to_to(terms_to(variable(X)), terms_to(variable(Y)), I), Ans),
   Ans = [X-Y-terms_to(variable(X)), X-Y-terms_to(variable(Y))].
 
 
 % Tests for terms_intersection_from_to/3
 test('terms_from_to_intersection_c_c_=') :-
-  setof(I, terms_intersection_from_to(terms_from(const(x)), terms_to(const(x)), I), [singleton(const(x))]).
+  setof(I, clp_term:terms_intersection_from_to(terms_from(const(x)), terms_to(const(x)), I), [singleton(const(x))]).
 
 test('terms_from_to_intersection_c_c_<') :-
-  setof(I, terms_intersection_from_to(terms_from(const(x)), terms_to(const(y)), I), [[const(x), const(y)]]).
+  setof(I, clp_term:terms_intersection_from_to(terms_from(const(x)), terms_to(const(y)), I), [[const(x), const(y)]]).
 
 test('terms_from_to_intersection_c_c_>') :-
-  setof(I, terms_intersection_from_to(terms_from(const(y)), terms_to(const(x)), I), [empty]).
+  setof(I, clp_term:terms_intersection_from_to(terms_from(const(y)), terms_to(const(x)), I), [empty]).
 
 test('terms_from_to_intersection_c_v') :-
-  setof(Y-I, terms_intersection_from_to(terms_from(const(x)), terms_to(variable(Y)), I), Ans),
+  setof(Y-I, clp_term:terms_intersection_from_to(terms_from(const(x)), terms_to(variable(Y)), I), Ans),
   Ans = [Y-empty, Y-[const(x), variable(Y)], Y-singleton(const(x))].
 
 test('terms_from_to_intersection_c_v_unified') :-
-  setof(Y, terms_intersection_from_to(terms_from(const(x)), terms_to(variable(Y)), singleton(const(x))), [Y1]),
+  setof(Y, clp_term:terms_intersection_from_to(terms_from(const(x)), terms_to(variable(Y)), singleton(const(x))), [Y1]),
   Y1 == x.
 
 test('terms_from_to_intersection_v_c') :-
-  setof(X-I, terms_intersection_from_to(terms_from(variable(X)), terms_to(const(y)), I), Ans),
+  setof(X-I, clp_term:terms_intersection_from_to(terms_from(variable(X)), terms_to(const(y)), I), Ans),
   Ans = [X-empty, X-[variable(X), const(y)], X-singleton(const(y))].
 
 test('terms_from_to_intersection_v_c_unified') :-
-  setof(X, terms_intersection_from_to(terms_from(variable(X)), terms_to(const(y)), singleton(const(y))), [X1]),
+  setof(X, clp_term:terms_intersection_from_to(terms_from(variable(X)), terms_to(const(y)), singleton(const(y))), [X1]),
   X1 == y.
 
 test('terms_from_to_intersection_v_v') :-
-  setof(X-Y-I, terms_intersection_from_to(terms_from(variable(X)), terms_to(variable(Y)), I), Ans),
+  setof(X-Y-I, clp_term:terms_intersection_from_to(terms_from(variable(X)), terms_to(variable(Y)), I), Ans),
   Ans = [X-Y-empty, X-Y-[variable(X), variable(Y)], X-Y-singleton(variable(X))].
 
 test('terms_from_to_intersection_v_v_unified') :-
-  setof(X-Y, terms_intersection_from_to(terms_from(variable(X)), terms_to(variable(Y)), singleton(variable(X))), [X1-Y1]),
+  setof(X-Y, clp_term:terms_intersection_from_to(terms_from(variable(X)), terms_to(variable(Y)), singleton(variable(X))), [X1-Y1]),
   X1 == Y1.
 
 test('terms_from_to_intersection_v_v_not_interval_if_identical', [ fail ]) :-
   X = Y,
-  terms_intersection_from_to(terms_from(variable(X)), terms_to(variable(Y)), [variable(X), variable(Y)]).
+  clp_term:terms_intersection_from_to(terms_from(variable(X)), terms_to(variable(Y)), [variable(X), variable(Y)]).
 
 
 % Tests for terms_intersection_to_from/3
 test('terms_to_from_intersection_agrees_with_from_to') :-
-  setof(X-Y-ToFrom, terms_intersection_to_from(terms_to(variable(X)), terms_from(variable(Y)), ToFrom), ToFroms),
-  setof(X-Y-FromTo, terms_intersection_from_to(terms_from(variable(Y)), terms_to(variable(X)), FromTo), ToFroms).
+  setof(X-Y-ToFrom, clp_term:terms_intersection_to_from(terms_to(variable(X)), terms_from(variable(Y)), ToFrom), ToFroms),
+  setof(X-Y-FromTo, clp_term:terms_intersection_from_to(terms_from(variable(Y)), terms_to(variable(X)), FromTo), ToFroms).
 
 
 % Tests for terms_intersection_from_int/3
@@ -535,48 +534,48 @@ test('terms_to_from_intersection_agrees_with_from_to') :-
 % |   >   |   =   |  [z]                     |
 % |   >   |   >   |  []                      |
 test('terms_from_int_intersection_?_?') :-
-  setof(Y-Z-I, terms_intersection_from_int(terms_from(const(a)), [variable(Y), variable(Z)], I), Ans),
+  setof(Y-Z-I, clp_term:terms_intersection_from_int(terms_from(const(a)), [variable(Y), variable(Z)], I), Ans),
   Ans = [Y-Z-empty, Y-Z-singleton(const(a)), Y-Z-[const(a), variable(Z)], Y-Z-[variable(Y), variable(Z)]].
 
 test('terms_from_int_intersection_?_?_unified') :-
-  setof(Z, terms_intersection_from_int(terms_from(const(a)), [variable(_), variable(Z)], singleton(const(a))), [Z1]),
+  setof(Z, clp_term:terms_intersection_from_int(terms_from(const(a)), [variable(_), variable(Z)], singleton(const(a))), [Z1]),
   Z1 == a.
 
 test('terms_from_int_intersection_?_<') :-
-  setof(Y-I, terms_intersection_from_int(terms_from(const(a)), [variable(Y), const(c)], I), Ans),
+  setof(Y-I, clp_term:terms_intersection_from_int(terms_from(const(a)), [variable(Y), const(c)], I), Ans),
   Ans = [Y-[const(a), const(c)], Y-[variable(Y), const(c)]].
 
 test('terms_from_int_intersection_?_=') :-
-  terms_intersection_from_int(terms_from(const(a)), [variable(_), const(a)], singleton(const(a))).
+  clp_term:terms_intersection_from_int(terms_from(const(a)), [variable(_), const(a)], singleton(const(a))).
 
 test('terms_from_int_intersection_?_>') :-
-  terms_intersection_from_int(terms_from(const(b)), [variable(_), const(a)], empty).
+  clp_term:terms_intersection_from_int(terms_from(const(b)), [variable(_), const(a)], empty).
 
 test('terms_from_int_intersection_<_?') :-
-  terms_intersection_from_int(terms_from(const(a)), [const(b), variable(Z)], [const(b), variable(Z)]).
+  clp_term:terms_intersection_from_int(terms_from(const(a)), [const(b), variable(Z)], [const(b), variable(Z)]).
 
 test('terms_from_int_intersection_<_<') :-
-  terms_intersection_from_int(terms_from(const(a)), [const(b), const(c)], [const(b), const(c)]).
+  clp_term:terms_intersection_from_int(terms_from(const(a)), [const(b), const(c)], [const(b), const(c)]).
 
 test('terms_from_int_intersection_=_<') :-
-  terms_intersection_from_int(terms_from(const(a)), [const(a), const(b)], [const(a), const(b)]).
+  clp_term:terms_intersection_from_int(terms_from(const(a)), [const(a), const(b)], [const(a), const(b)]).
 
 test('terms_from_int_intersection_>_?') :-
-  setof(Z-I, terms_intersection_from_int(terms_from(const(b)), [const(a), variable(Z)], I), Ans),
+  setof(Z-I, clp_term:terms_intersection_from_int(terms_from(const(b)), [const(a), variable(Z)], I), Ans),
   Ans = [Z-empty, Z-[const(b), variable(Z)], Z-singleton(const(b))].
 
 test('terms_from_int_intersection_>_?_unified') :-
-  setof(Z, terms_intersection_from_int(terms_from(const(b)), [const(a), variable(Z)], singleton(const(b))), [Z1]),
+  setof(Z, clp_term:terms_intersection_from_int(terms_from(const(b)), [const(a), variable(Z)], singleton(const(b))), [Z1]),
   Z1 == b.
 
 test('terms_from_int_intersection_>_<') :-
-  terms_intersection_from_int(terms_from(const(b)), [const(a), const(c)], [const(b), const(c)]).
+  clp_term:terms_intersection_from_int(terms_from(const(b)), [const(a), const(c)], [const(b), const(c)]).
 
 test('terms_from_int_intersection_>_=') :-
-  terms_intersection_from_int(terms_from(const(b)), [const(a), const(b)], singleton(const(b))).
+  clp_term:terms_intersection_from_int(terms_from(const(b)), [const(a), const(b)], singleton(const(b))).
 
 test('terms_from_int_intersection_>_>') :-
-  terms_intersection_from_int(terms_from(const(c)), [const(a), const(b)], empty).
+  clp_term:terms_intersection_from_int(terms_from(const(c)), [const(a), const(b)], empty).
 
 
 % Tests for terms_intersection_int_from/3
@@ -584,8 +583,8 @@ test('terms_int_from_intersection_agrees_with_from_int', [ fail ]) :-
   member(X, [const(1), variable(_)]),
   member(Y, [const(3), variable(_)]),
   member(Z, [const(2), variable(_)]),
-  setof(X-Y-Z-IntFrom, terms_intersection_int_from([X, Y], terms_from(Z), IntFrom), IntFroms),
-  \+ setof(X-Y-Z-FromInt, terms_intersection_from_int(terms_from(Z), [X, Y], FromInt), IntFroms).
+  setof(X-Y-Z-IntFrom, clp_term:terms_intersection_int_from([X, Y], terms_from(Z), IntFrom), IntFroms),
+  \+ setof(X-Y-Z-FromInt, clp_term:terms_intersection_from_int(terms_from(Z), [X, Y], FromInt), IntFroms).
 
 
 % Tests for terms_intersection_to_int/3
@@ -603,51 +602,51 @@ test('terms_int_from_intersection_agrees_with_from_int', [ fail ]) :-
 % |   >   |   =   | [y,z]                 |
 % |   >   |   >   | [y,z]                 |
 test('terms_to_int_intersection_?_?') :-
-  setof(Y-Z-I, terms_intersection_to_int(terms_to(const(a)), [variable(Y), variable(Z)], I), Ans),
+  setof(Y-Z-I, clp_term:terms_intersection_to_int(terms_to(const(a)), [variable(Y), variable(Z)], I), Ans),
   Ans = [Y-Z-empty, Y-Z-[variable(Y), const(a)], Y-Z-[variable(Y), variable(Z)], Y-Z-singleton(const(a))].
 
 test('terms_to_int_intersection_?_?_unified') :-
-  setof(Y, terms_intersection_to_int(terms_to(const(a)), [variable(Y), variable(_)], singleton(const(a))), [Y1]),
+  setof(Y, clp_term:terms_intersection_to_int(terms_to(const(a)), [variable(Y), variable(_)], singleton(const(a))), [Y1]),
   Y1 == a.
 
 test('terms_to_int_intersection_?_<') :-
-  setof(Y-I, terms_intersection_to_int(terms_to(const(a)), [variable(Y), const(c)], I), Ans),
+  setof(Y-I, clp_term:terms_intersection_to_int(terms_to(const(a)), [variable(Y), const(c)], I), Ans),
   Ans = [Y-empty, Y-[variable(Y), const(a)], Y-singleton(const(a))].
 
 test('terms_to_int_intersection_?_<_unified') :-
-  setof(Y, terms_intersection_to_int(terms_to(const(a)), [variable(Y), const(c)], singleton(const(a))), [Y1]),
+  setof(Y, clp_term:terms_intersection_to_int(terms_to(const(a)), [variable(Y), const(c)], singleton(const(a))), [Y1]),
   Y1 == a.
 
 test('terms_to_int_intersection_?_=') :-
-  terms_intersection_to_int(terms_to(const(a)), [variable(Y), const(a)], [variable(Y), const(a)]).
+  clp_term:terms_intersection_to_int(terms_to(const(a)), [variable(Y), const(a)], [variable(Y), const(a)]).
 
 test('terms_to_int_intersection_?_>') :-
-  terms_intersection_to_int(terms_to(const(b)), [variable(Y), const(a)], [variable(Y), const(a)]).
+  clp_term:terms_intersection_to_int(terms_to(const(b)), [variable(Y), const(a)], [variable(Y), const(a)]).
 
 test('terms_to_int_intersection_<_?') :-
-  terms_intersection_to_int(terms_to(const(a)), [const(b), variable(_)], empty).
+  clp_term:terms_intersection_to_int(terms_to(const(a)), [const(b), variable(_)], empty).
 
 test('terms_to_int_intersection_<_<') :-
-  terms_intersection_to_int(terms_to(const(a)), [const(b), const(c)], empty).
+  clp_term:terms_intersection_to_int(terms_to(const(a)), [const(b), const(c)], empty).
 
 test('terms_to_int_intersection_=_<') :-
-  terms_intersection_to_int(terms_to(const(a)), [const(a), const(b)], singleton(const(a))).
+  clp_term:terms_intersection_to_int(terms_to(const(a)), [const(a), const(b)], singleton(const(a))).
 
 test('terms_to_int_intersection_=_?') :-
-  terms_intersection_to_int(terms_to(const(a)), [const(a), variable(_)], singleton(const(a))).
+  clp_term:terms_intersection_to_int(terms_to(const(a)), [const(a), variable(_)], singleton(const(a))).
 
 test('terms_to_int_intersection_>_?') :-
-  setof(Z-I, terms_intersection_to_int(terms_to(const(b)), [const(a), variable(Z)], I), Ans),
+  setof(Z-I, clp_term:terms_intersection_to_int(terms_to(const(b)), [const(a), variable(Z)], I), Ans),
   Ans = [Z-[const(a), variable(Z)], Z-[const(a), const(b)]].
 
 test('terms_to_int_intersection_>_<') :-
-  terms_intersection_to_int(terms_to(const(b)), [const(a), const(c)], [const(a), const(b)]).
+  clp_term:terms_intersection_to_int(terms_to(const(b)), [const(a), const(c)], [const(a), const(b)]).
 
 test('terms_to_int_intersection_>_=') :-
-  terms_intersection_to_int(terms_to(const(b)), [const(a), const(b)], [const(a), const(b)]).
+  clp_term:terms_intersection_to_int(terms_to(const(b)), [const(a), const(b)], [const(a), const(b)]).
 
 test('terms_to_int_intersection_>_>') :-
-  terms_intersection_to_int(terms_to(const(c)), [const(a), const(b)], [const(a), const(b)]).
+  clp_term:terms_intersection_to_int(terms_to(const(c)), [const(a), const(b)], [const(a), const(b)]).
 
 
 % Tests for terms_intersection_int_to/3
@@ -655,8 +654,8 @@ test('terms_int_to_intersection_agrees_with_to_int', [ fail ]) :-
   member(X, [const(1), variable(_)]),
   member(Y, [const(3), variable(_)]),
   member(Z, [const(2), variable(_)]),
-  setof(X-Y-Z-IntTo, terms_intersection_int_to([X, Y], terms_to(Z), IntTo), IntTos),
-  \+ setof(X-Y-Z-ToInt, terms_intersection_to_int(terms_to(Z), [X, Y], ToInt), IntTos).
+  setof(X-Y-Z-IntTo, clp_term:terms_intersection_int_to([X, Y], terms_to(Z), IntTo), IntTos),
+  \+ setof(X-Y-Z-ToInt, clp_term:terms_intersection_to_int(terms_to(Z), [X, Y], ToInt), IntTos).
 
 
 % Tests for terms_intersection_int_int/3
@@ -666,54 +665,54 @@ test('terms_int_to_intersection_agrees_with_to_int', [ fail ]) :-
 % |     |     |  =  |     | [y]                        | [x[y]w]
 % |     |  =  |     |     | [x]                        | [z[x]y]
 test('terms_int_int_intersection_y<z') :-
-  terms_intersection_int_int([variable(_), const(b)], [const(c), variable(_)], empty).
+  clp_term:terms_intersection_int_int([variable(_), const(b)], [const(c), variable(_)], empty).
 
 test('terms_int_int_intersection_x>w') :-
-  terms_intersection_int_int([const(b), variable(_)], [variable(_), const(a)], empty).
+  clp_term:terms_intersection_int_int([const(b), variable(_)], [variable(_), const(a)], empty).
 
 test('terms_int_int_intersection_y=z') :-
-  terms_intersection_int_int([variable(_), const(b)], [const(b), variable(_)], singleton(const(b))).
+  clp_term:terms_intersection_int_int([variable(_), const(b)], [const(b), variable(_)], singleton(const(b))).
 
 test('terms_int_int_intersection_x=w') :-
-  terms_intersection_int_int([const(a), variable(_)], [variable(_), const(a)], singleton(const(a))).
+  clp_term:terms_intersection_int_int([const(a), variable(_)], [variable(_), const(a)], singleton(const(a))).
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
 % |  <  |  <  |  >  |  <  | [z,y]                      | [x[zy]w]
 % |  <  |  <  |  >  |  =  | [z,y]                      | [x[zy]y]
 % |  <  |  <  |  >  |  >  | [z,w]                      | [x[zw]y]
 test('terms_int_int_intersection_<_<_>_<') :-
-  terms_intersection_int_int([const(a), const(c)], [const(b), const(d)], [const(b), const(c)]).
+  clp_term:terms_intersection_int_int([const(a), const(c)], [const(b), const(d)], [const(b), const(c)]).
 
 test('terms_int_int_intersection_<_<_>_=') :-
-  terms_intersection_int_int([const(a), const(c)], [const(b), const(c)], [const(b), const(c)]).
+  clp_term:terms_intersection_int_int([const(a), const(c)], [const(b), const(c)], [const(b), const(c)]).
 
 test('terms_int_int_intersection_<_<_>_>') :-
-  terms_intersection_int_int([const(a), const(d)], [const(b), const(c)], [const(b), const(c)]).
+  clp_term:terms_intersection_int_int([const(a), const(d)], [const(b), const(c)], [const(b), const(c)]).
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
 % |  <  |  <  |  ?  |  ?  | [z,w]; [z,y]; [z]; empty   | [x[zw]y] or [x[zy]w] or [xy][zw]
 test('terms_int_int_intersection_<_<_?_?') :-
-  setof(Y-I, terms_intersection_int_int([const(a), variable(Y)], [const(b), const(c)], I), Ans),
+  setof(Y-I, clp_term:terms_intersection_int_int([const(a), variable(Y)], [const(b), const(c)], I), Ans),
   Ans = [Y-empty, Y-[const(b), variable(Y)], Y-[const(b), const(c)], Y-singleton(const(b))].
 
 test('terms_int_int_intersection_<_<_?_?_unified') :-
-  setof(Y, terms_intersection_int_int([const(a), variable(Y)], [const(b), const(c)], singleton(const(b))), [Y1]),
+  setof(Y, clp_term:terms_intersection_int_int([const(a), variable(Y)], [const(b), const(c)], singleton(const(b))), [Y1]),
   Y1 == b.
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
 % |  <  |  ?  |  >  |  ?  | [z,w]; [z,y]               | [x[zw]y] or [x[zy]w]
 test('terms_int_int_intersection_<_?_>_?') :-
-  setof(W-I, terms_intersection_int_int([const(a), const(c)], [const(b), variable(W)], I), Ans),
+  setof(W-I, clp_term:terms_intersection_int_int([const(a), const(c)], [const(b), variable(W)], I), Ans),
   Ans = [W-[const(b), const(c)], W-[const(b), variable(W)]].
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
 % |  <  |  ?  |  ?  |  ?  | [z,w]; [z,y]; [y]; empty   | [x[zw]y] or [x[zy]w] or [xy][zw]
 test('terms_int_int_intersection_<_?_?_?') :-
-  setof(Y-W-I, terms_intersection_int_int([const(a), variable(Y)], [const(c), variable(W)], I), Ans),
+  setof(Y-W-I, clp_term:terms_intersection_int_int([const(a), variable(Y)], [const(c), variable(W)], I), Ans),
   Ans = [Y-W-empty, Y-W-[const(c), variable(Y)], Y-W-[const(c), variable(W)], Y-W-singleton(const(c))].
 
 test('terms_int_int_intersection_<_?_?_?_unified') :-
-  setof(Y, terms_intersection_int_int([const(a), variable(Y)], [const(c), variable(_)], singleton(const(c))), [Y1]),
+  setof(Y, clp_term:terms_intersection_int_int([const(a), variable(Y)], [const(c), variable(_)], singleton(const(c))), [Y1]),
   Y1 == c.
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
@@ -721,30 +720,30 @@ test('terms_int_int_intersection_<_?_?_?_unified') :-
 % |  =  |  <  |  >  |  =  | [z,y]                      | [[zy]y]
 % |  =  |  <  |  >  |  >  | [z,w]                      | [[zw]y]
 test('terms_int_int_intersection_=_<_>_<') :-
-  terms_intersection_int_int([const(a), const(b)], [const(a), const(d)], [const(a), const(b)]).
+  clp_term:terms_intersection_int_int([const(a), const(b)], [const(a), const(d)], [const(a), const(b)]).
 
 test('terms_int_int_intersection_=_<_>_=') :-
-  terms_intersection_int_int([const(a), const(d)], [const(a), const(d)], [const(a), const(d)]).
+  clp_term:terms_intersection_int_int([const(a), const(d)], [const(a), const(d)], [const(a), const(d)]).
 
 test('terms_int_int_intersection_=_<_>_>') :-
-  terms_intersection_int_int([const(a), const(d)], [const(a), const(c)], [const(a), const(c)]).
+  clp_term:terms_intersection_int_int([const(a), const(d)], [const(a), const(c)], [const(a), const(c)]).
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
 % |  =  |  <  |  ?  |  ?  | [z,w]; [z,y]               | [[zw]y] or [[zy]w]
 test('terms_int_int_intersection_=_<_?_?') :-
-  setof(Y-I, terms_intersection_int_int([const(a), variable(Y)], [const(a), const(d)], I), Ans),
+  setof(Y-I, clp_term:terms_intersection_int_int([const(a), variable(Y)], [const(a), const(d)], I), Ans),
   Ans = [Y-[const(a), variable(Y)], Y-[const(a), const(d)]].
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
 % |  =  |  ?  |  >  |  ?  | [z,w]; [z,y]               | [[zw]y] or [[zy]w]
 test('terms_int_int_intersection_=_?_>_?') :-
-  setof(W-I, terms_intersection_int_int([const(a), const(b)], [const(a), variable(W)], I), Ans),
+  setof(W-I, clp_term:terms_intersection_int_int([const(a), const(b)], [const(a), variable(W)], I), Ans),
   Ans = [W-[const(a), const(b)], W-[const(a), variable(W)]].
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
 % |  =  |  ?  |  ?  |  ?  | [z,w]; [z,y]               | [[zw]y] or [[zy]w]
 test('terms_int_int_intersection_=_?_?_?') :-
-  setof(Y-W-I, terms_intersection_int_int([const(a), variable(Y)], [const(a), variable(W)], I), Ans),
+  setof(Y-W-I, clp_term:terms_intersection_int_int([const(a), variable(Y)], [const(a), variable(W)], I), Ans),
   Ans = [Y-W-[const(a), variable(Y)], Y-W-[const(a), variable(W)]].
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
@@ -752,38 +751,38 @@ test('terms_int_int_intersection_=_?_?_?') :-
 % |  >  |  <  |  >  |  =  | [x,y]                      | [z[xy]y]
 % |  >  |  <  |  >  |  >  | [x,w]                      | [z[xw]y]
 test('terms_int_int_intersection_>_<_>_<') :-
-  terms_intersection_int_int([const(b), const(c)], [const(a), const(d)], [const(b), const(c)]).
+  clp_term:terms_intersection_int_int([const(b), const(c)], [const(a), const(d)], [const(b), const(c)]).
 
 test('terms_int_int_intersection_>_<_>_=') :-
-  terms_intersection_int_int([const(b), const(c)], [const(a), const(c)], [const(b), const(c)]).
+  clp_term:terms_intersection_int_int([const(b), const(c)], [const(a), const(c)], [const(b), const(c)]).
 
 test('terms_int_int_intersection_>_<_>_>') :-
-  terms_intersection_int_int([const(b), const(d)], [const(a), const(c)], [const(b), const(c)]).
+  clp_term:terms_intersection_int_int([const(b), const(d)], [const(a), const(c)], [const(b), const(c)]).
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
 % |  >  |  <  |  ?  |  ?  | [x,w]; [x,y]               | [z[xw]y] or [z[xy]w]
 test('terms_int_int_intersection_>_<_?_?') :-
-  setof(Y-I, terms_intersection_int_int([const(c), variable(Y)], [const(a), const(d)], I), Ans),
+  setof(Y-I, clp_term:terms_intersection_int_int([const(c), variable(Y)], [const(a), const(d)], I), Ans),
   Ans = [Y-[const(c), variable(Y)], Y-[const(c), const(d)]].
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
 % |  >  |  ?  |  >  |  ?  | [x,w]; [x,y]; [x]; empty   | [z[xw]y] or [z[xy]w] or [zw][xy]
 test('terms_int_int_intersection_>_?_>_?') :-
-  setof(W-I, terms_intersection_int_int([const(b), const(c)], [const(a), variable(W)], I), Ans),
+  setof(W-I, clp_term:terms_intersection_int_int([const(b), const(c)], [const(a), variable(W)], I), Ans),
   Ans = [W-empty, W-[const(b), const(c)], W-[const(b), variable(W)], W-singleton(const(b))].
 
 test('terms_int_int_intersection_>_?_>_?_unified') :-
-  setof(W, terms_intersection_int_int([const(b), const(c)], [const(a), variable(W)], singleton(const(b))), [W1]),
+  setof(W, clp_term:terms_intersection_int_int([const(b), const(c)], [const(a), variable(W)], singleton(const(b))), [W1]),
   W1 == b.
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
 % |  >  |  ?  |  ?  |  ?  | [x,w]; [x,y]; [x]; empty   | [z[xw]y] or [z[xy]w] or [zw][xy]
 test('terms_int_int_intersection_>_?_?_?') :-
-  setof(Y-W-I, terms_intersection_int_int([const(c), variable(Y)], [const(a), variable(W)], I), Ans),
+  setof(Y-W-I, clp_term:terms_intersection_int_int([const(c), variable(Y)], [const(a), variable(W)], I), Ans),
   Ans = [Y-W-empty, Y-W-singleton(const(c)), Y-W-[const(c), variable(Y)], Y-W-[const(c), variable(W)]].
 
 test('terms_int_int_intersection_>_?_?_?_unified') :-
-  setof(W, terms_intersection_int_int([const(c), variable(_)], [const(a), variable(W)], singleton(const(c))), [W1]),
+  setof(W, clp_term:terms_intersection_int_int([const(c), variable(_)], [const(a), variable(W)], singleton(const(c))), [W1]),
   W1 == c.
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
@@ -793,28 +792,28 @@ test('terms_int_int_intersection_>_?_?_?_unified') :-
 % |  ?  |  <  |  ?  |  ?  | [z,w]; [x,w]; [z,y];       |
 %                         | [x,y]; [y]; empty          |
 test('terms_int_int_intersection_?_<_?_<') :-
-  setof(Z-I, terms_intersection_int_int([const(a), const(b)], [variable(Z), const(d)], I), Ans),
+  setof(Z-I, clp_term:terms_intersection_int_int([const(a), const(b)], [variable(Z), const(d)], I), Ans),
   Ans = [Z-empty, Z-[const(a), const(b)], Z-[variable(Z), const(b)], Z-singleton(const(b))].
 
 test('terms_int_int_intersection_?_<_?_<_unified') :-
-  setof(Z, terms_intersection_int_int([const(a), const(b)], [variable(Z), const(d)], singleton(const(b))), [Z1]),
+  setof(Z, clp_term:terms_intersection_int_int([const(a), const(b)], [variable(Z), const(d)], singleton(const(b))), [Z1]),
   Z1 == b.
 
 test('terms_int_int_intersection_?_<_?_=') :-
-  setof(Z-I, terms_intersection_int_int([const(a), const(b)], [variable(Z), const(b)], I), Ans),
+  setof(Z-I, clp_term:terms_intersection_int_int([const(a), const(b)], [variable(Z), const(b)], I), Ans),
   Ans = [Z-[const(a), const(b)], Z-[variable(Z), const(b)]].
 
 test('terms_int_int_intersection_?_<_?_>') :-
-  setof(Z-I, terms_intersection_int_int([const(a), const(c)], [variable(Z), const(b)], I), Ans),
+  setof(Z-I, clp_term:terms_intersection_int_int([const(a), const(c)], [variable(Z), const(b)], I), Ans),
   Ans = [Z-[const(a), const(b)], Z-[variable(Z), const(b)]].
 
 test('terms_int_int_intersection_?_<_?_?') :-
-  setof(Y-Z-I, terms_intersection_int_int([const(a), variable(Y)], [variable(Z), const(b)], I), Ans),
+  setof(Y-Z-I, clp_term:terms_intersection_int_int([const(a), variable(Y)], [variable(Z), const(b)], I), Ans),
   Ans = [Y-Z-empty, Y-Z-singleton(variable(Y)), Y-Z-[const(a), variable(Y)], Y-Z-[variable(Z), variable(Y)],
          Y-Z-[const(a), const(b)], Y-Z-[variable(Z), const(b)]].
 
 test('terms_int_int_intersection_?_<_?_?_v') :-
-  setof(Y-Z, terms_intersection_int_int([const(a), variable(Y)], [variable(Z), const(b)], singleton(variable(Y))), [Y1-Z1]),
+  setof(Y-Z, clp_term:terms_intersection_int_int([const(a), variable(Y)], [variable(Z), const(b)], singleton(variable(Y))), [Y1-Z1]),
   Y1 == Z1.
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
@@ -824,28 +823,28 @@ test('terms_int_int_intersection_?_<_?_?_v') :-
 % |  ?  |  ?  |  >  |  ?  | [z,w]; [x,w]; [z,y];       |
 %                         | [x,y]; [x]; empty          |
 test('terms_int_int_intersection_?_?_>_<') :-
-  setof(X-I, terms_intersection_int_int([variable(X), const(c)], [const(b), const(d)], I), Ans),
+  setof(X-I, clp_term:terms_intersection_int_int([variable(X), const(c)], [const(b), const(d)], I), Ans),
   Ans = [X-[variable(X), const(c)], X-[const(b), const(c)]].
 
 test('terms_int_int_intersection_?_?_>_=') :-
-  setof(X-I, terms_intersection_int_int([variable(X), const(c)], [const(b), const(c)], I), Ans),
+  setof(X-I, clp_term:terms_intersection_int_int([variable(X), const(c)], [const(b), const(c)], I), Ans),
   Ans = [X-[variable(X), const(c)], X-[const(b), const(c)]].
 
 test('terms_int_int_intersection_?_?_>_>') :-
-  setof(X-I, terms_intersection_int_int([variable(X), const(d)], [const(b), const(c)], I), Ans),
+  setof(X-I, clp_term:terms_intersection_int_int([variable(X), const(d)], [const(b), const(c)], I), Ans),
   Ans = [X-empty, X-[variable(X), const(c)], X-[const(b), const(c)], X-singleton(const(c))].
 
 test('terms_int_int_intersection_?_?_>_>_X==c') :-
-  setof(X, terms_intersection_int_int([variable(X), const(d)], [const(b), const(c)], singleton(const(c))), [X1]),
+  setof(X, clp_term:terms_intersection_int_int([variable(X), const(d)], [const(b), const(c)], singleton(const(c))), [X1]),
   X1 == c.
 
 test('terms_int_int_intersection_?_?_>_?') :-
-  setof(X-W-I, terms_intersection_int_int([variable(X), const(c)], [const(b), variable(W)], I), Ans),
+  setof(X-W-I, clp_term:terms_intersection_int_int([variable(X), const(c)], [const(b), variable(W)], I), Ans),
   Ans = [X-W-empty, X-W-singleton(variable(X)), X-W-[variable(X), const(c)], X-W-[const(b), const(c)],
          X-W-[variable(X), variable(W)], X-W-[const(b), variable(W)]].
 
 test('terms_int_int_intersection_?_?_>_?_v') :-
-  setof(X-W, terms_intersection_int_int([variable(X), const(c)], [const(b), variable(W)], singleton(variable(X))), [X1-W1]),
+  setof(X-W, clp_term:terms_intersection_int_int([variable(X), const(c)], [const(b), variable(W)], singleton(variable(X))), [X1-W1]),
   X1 == W1.
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
@@ -855,47 +854,47 @@ test('terms_int_int_intersection_?_?_>_?_v') :-
 % |  ?  |  ?  |  ?  |  ?  | [z,w]; [x,w]; [z,y];       |
 %                         | [x,y]; [x]; [y]; empty     |
 test('terms_int_int_intersection_?_?_?_<') :-
-  setof(X-Z-I, terms_intersection_int_int([variable(X), const(b)], [variable(Z), const(d)], I), Ans),
+  setof(X-Z-I, clp_term:terms_intersection_int_int([variable(X), const(b)], [variable(Z), const(d)], I), Ans),
   Ans = [X-Z-empty, X-Z-singleton(const(b)), X-Z-[variable(X), const(b)], X-Z-[variable(Z), const(b)]].
 
 test('terms_int_int_intersection_?_?_?_<_Z==b') :-
-  setof(Z, terms_intersection_int_int([variable(_), const(b)], [variable(Z), const(d)], singleton(const(b))), [Z1]),
+  setof(Z, clp_term:terms_intersection_int_int([variable(_), const(b)], [variable(Z), const(d)], singleton(const(b))), [Z1]),
   Z1 == b.
 
 test('terms_int_int_intersection_?_?_?_=') :-
-  setof(X-Z-I, terms_intersection_int_int([variable(X), const(b)], [variable(Z), const(b)], I), Ans),
+  setof(X-Z-I, clp_term:terms_intersection_int_int([variable(X), const(b)], [variable(Z), const(b)], I), Ans),
   Ans = [X-Z-[variable(X), const(b)], X-Z-[variable(Z), const(b)]].
 
 test('terms_int_int_intersection_?_?_?_>') :-
-  setof(X-Z-I, terms_intersection_int_int([variable(X), const(d)], [variable(Z), const(b)], I), Ans),
+  setof(X-Z-I, clp_term:terms_intersection_int_int([variable(X), const(d)], [variable(Z), const(b)], I), Ans),
   Ans = [X-Z-empty, X-Z-[variable(Z), const(b)], X-Z-[variable(X), const(b)], X-Z-singleton(const(b))].
 
 test('terms_int_int_intersection_?_?_?_>_X==b') :-
-  setof(X, terms_intersection_int_int([variable(X), const(d)], [variable(_), const(b)], singleton(const(b))), [X1]),
+  setof(X, clp_term:terms_intersection_int_int([variable(X), const(d)], [variable(_), const(b)], singleton(const(b))), [X1]),
   X1 == b.
 
 test('terms_int_int_intersection_?_?_?_?') :-
-  setof(X-Y-Z-W-I, terms_intersection_int_int([variable(X), variable(Y)], [variable(Z), variable(W)], I), Ans),
+  setof(X-Y-Z-W-I, clp_term:terms_intersection_int_int([variable(X), variable(Y)], [variable(Z), variable(W)], I), Ans),
   Ans = [X-Y-Z-W-empty, X-Y-Z-W-singleton(variable(Y)), X-Y-Z-W-singleton(variable(X)),
          X-Y-Z-W-[variable(X), variable(Y)], X-Y-Z-W-[variable(Z), variable(Y)],
          X-Y-Z-W-[variable(X), variable(W)], X-Y-Z-W-[variable(Z), variable(W)]].
 
 test('terms_int_int_intersection_?_?_?_?_x==w', [ fail ]) :-
-  terms_intersection_int_int([variable(X), variable(_)], [variable(_), variable(W)], singleton(variable(X))),
+  clp_term:terms_intersection_int_int([variable(X), variable(_)], [variable(_), variable(W)], singleton(variable(X))),
   \+ X == W.
 
 test('terms_int_int_intersection_?_?_?_?_y==z', [ fail ]) :-
-  terms_intersection_int_int([variable(_), variable(Y)], [variable(Z), variable(_)], singleton(variable(Y))),
+  clp_term:terms_intersection_int_int([variable(_), variable(Y)], [variable(Z), variable(_)], singleton(variable(Y))),
   \+ Y == Z.
 
 test('terms_int_int_intersection_y==z_shortcuts_to_singleton') :-
   Y = Z,
-  setof(Y-Z-I, terms_intersection_int_int([variable(_), variable(Y)], [variable(Z), variable(_)], I), Ans),
+  setof(Y-Z-I, clp_term:terms_intersection_int_int([variable(_), variable(Y)], [variable(Z), variable(_)], I), Ans),
   Ans = [Y-Z-singleton(variable(Y))].
 
 test('terms_int_int_intersection_x==w_shortcuts_to_singleton') :-
   X = W,
-  setof(X-W-I, terms_intersection_int_int([variable(X), variable(_)], [variable(_), variable(W)], I), Ans),
+  setof(X-W-I, clp_term:terms_intersection_int_int([variable(X), variable(_)], [variable(_), variable(W)], I), Ans),
   Ans = [X-W-singleton(variable(X))].
 
 
@@ -935,15 +934,15 @@ test('terms_dom_intersection_termsfrom_singleton_v_v') :-
 
 test('terms_dom_intersection_termsfrom_termsfrom') :-
   setof(X-Y-FromFrom1, terms_dom_intersection(terms_from(variable(X)), terms_from(variable(Y)), FromFrom1), FromFrom1s),
-  setof(X-Y-FromFrom2, terms_intersection_from_from(terms_from(variable(X)), terms_from(variable(Y)), FromFrom2), FromFrom1s).
+  setof(X-Y-FromFrom2, clp_term:terms_intersection_from_from(terms_from(variable(X)), terms_from(variable(Y)), FromFrom2), FromFrom1s).
 
 test('terms_dom_intersection_termsfrom_termsto') :-
   setof(X-Y-FromTo1, terms_dom_intersection(terms_from(variable(X)), terms_to(variable(Y)), FromTo1), FromTo1s),
-  setof(X-Y-FromTo2, terms_intersection_from_to(terms_from(variable(X)), terms_to(variable(Y)), FromTo2), FromTo1s).
+  setof(X-Y-FromTo2, clp_term:terms_intersection_from_to(terms_from(variable(X)), terms_to(variable(Y)), FromTo2), FromTo1s).
 
 test('terms_dom_intersection_termsfrom_int') :-
   setof(X-Y-Z-FromInt1, terms_dom_intersection(terms_from(variable(X)), [variable(Y),variable(Z)], FromInt1), FromInt1s),
-  setof(X-Y-Z-FromInt2, terms_intersection_from_int(terms_from(variable(X)), [variable(Y),variable(Z)], FromInt2), FromInt1s).
+  setof(X-Y-Z-FromInt2, clp_term:terms_intersection_from_int(terms_from(variable(X)), [variable(Y),variable(Z)], FromInt2), FromInt1s).
 
 test('terms_dom_intersection_termsto_allterms') :-
   terms_dom_intersection(terms_to(variable(X)), all_terms, terms_to(variable(X))).
@@ -965,15 +964,15 @@ test('terms_dom_intersection_termsto_singleton_v_v') :-
 
 test('terms_dom_intersection_termsto_termsfrom') :-
   setof(X-Y-ToFrom1, terms_dom_intersection(terms_to(variable(X)), terms_from(variable(Y)), ToFrom1), ToFrom1s),
-  setof(X-Y-ToFrom2, terms_intersection_to_from(terms_to(variable(X)), terms_from(variable(Y)), ToFrom2), ToFrom1s).
+  setof(X-Y-ToFrom2, clp_term:terms_intersection_to_from(terms_to(variable(X)), terms_from(variable(Y)), ToFrom2), ToFrom1s).
 
 test('terms_dom_intersection_termsto_termsto') :-
   setof(X-Y-ToTo1, terms_dom_intersection(terms_to(variable(X)), terms_to(variable(Y)), ToTo1), ToTo1s),
-  setof(X-Y-ToTo2, terms_intersection_to_to(terms_to(variable(X)), terms_to(variable(Y)), ToTo2), ToTo1s).
+  setof(X-Y-ToTo2, clp_term:terms_intersection_to_to(terms_to(variable(X)), terms_to(variable(Y)), ToTo2), ToTo1s).
 
 test('terms_dom_intersection_termsto_int') :-
   setof(X-Y-Z-ToInt1, terms_dom_intersection(terms_to(variable(X)), [variable(Y),variable(Z)], ToInt1), ToInt1s),
-  setof(X-Y-Z-ToInt2, terms_intersection_to_int(terms_to(variable(X)), [variable(Y),variable(Z)], ToInt2), ToInt1s).
+  setof(X-Y-Z-ToInt2, clp_term:terms_intersection_to_int(terms_to(variable(X)), [variable(Y),variable(Z)], ToInt2), ToInt1s).
 
 test('terms_dom_intersection_int_allterms') :-
   terms_dom_intersection([variable(X),variable(Y)], all_terms, [variable(X),variable(Y)]).
@@ -1011,15 +1010,15 @@ test('terms_dom_intersection_int_singleton_[v,v]_v') :-
 
 test('terms_dom_intersection_int_termsfrom') :-
   setof(X-Y-Z-IntFrom1, terms_dom_intersection([variable(X),variable(Y)], terms_from(variable(Z)), IntFrom1), IntFrom1s),
-  setof(X-Y-Z-IntFrom2, terms_intersection_from_int(terms_from(variable(Z)), [variable(X),variable(Y)], IntFrom2), IntFrom1s).
+  setof(X-Y-Z-IntFrom2, clp_term:terms_intersection_from_int(terms_from(variable(Z)), [variable(X),variable(Y)], IntFrom2), IntFrom1s).
 
 test('terms_dom_intersection_int_termsto') :-
   setof(X-Y-Z-IntTo1, terms_dom_intersection([variable(X),variable(Y)], terms_to(variable(Z)), IntTo1), IntTo1s),
-  setof(X-Y-Z-IntTo2, terms_intersection_to_int(terms_to(variable(Z)), [variable(X),variable(Y)], IntTo2), IntTo1s).
+  setof(X-Y-Z-IntTo2, clp_term:terms_intersection_to_int(terms_to(variable(Z)), [variable(X),variable(Y)], IntTo2), IntTo1s).
 
 test('terms_dom_intersection_int_int') :-
   setof(X-Y-Z-W-IntInt1, terms_dom_intersection([variable(X),variable(Y)], [variable(Z),variable(W)], IntInt1), IntInt1s),
-  setof(X-Y-Z-W-IntInt2, terms_intersection_int_int([variable(X),variable(Y)], [variable(Z),variable(W)], IntInt2), IntInt1s).
+  setof(X-Y-Z-W-IntInt2, clp_term:terms_intersection_int_int([variable(X),variable(Y)], [variable(Z),variable(W)], IntInt2), IntInt1s).
 
 test('terms_dom_intersection_singleton_allterms') :-
   terms_dom_intersection(singleton(variable(X)), all_terms, singleton(variable(X))).
@@ -1217,11 +1216,11 @@ test('terms_dom_intersection_uninst_1st', [ fail ]) :-
 test('terms_dom_intersection_uninst_2nd', [ fail ]) :-
   terms_dom_intersection(terms_from(variable(_)), _, terms_from(variable(_))).
 
-test('terms_dom_intersection_1st_uninst_endpoint', [ fail ]) :-
-  terms_dom_intersection(terms_from(_), terms_from(variable(_)), terms_from(variable(_))).
+test('terms_dom_intersection_1st_uninst_endpoint', [ throws(error(instantiation_error(X), _)) ]) :-
+  terms_dom_intersection(terms_from(X), terms_from(variable(_)), terms_from(variable(_))).
 
-test('terms_dom_intersection_2nd_uninst_endpoint', [ fail ]) :-
-  terms_dom_intersection(terms_from(variable(_)), terms_from(_), terms_from(variable(_))).
+test('terms_dom_intersection_2nd_uninst_endpoint', [ throws(error(instantiation_error(Y), _)) ]) :-
+  terms_dom_intersection(terms_from(variable(_)), terms_from(Y), terms_from(variable(_))).
 
 
 % Tests for the unification hook
@@ -1237,8 +1236,8 @@ test('unify_singleton_intersection_sets_exact_value_and_removes_attributes_c', [
   (X \== 2 ; Y \== 2 ; get_attr(X, term_order, _) ; get_attr(Y, term_order, _)).
 
 test('unify_singleton_intersection2_sets_exact_value_and_removes_attributes_c', [ fail ]) :-
-  term_indomain(X, [const(1), const(2)]),
-  term_indomain(Y, [const(2), const(3)]),
+  clp_term:term_indomain(X, [const(1), const(2)]),
+  clp_term:term_indomain(Y, [const(2), const(3)]),
   X = Y,
   (X \== 2 ; Y \== 2 ; get_attr(X, term_order, _) ; get_attr(Y, term_order, _)).
 
@@ -1249,68 +1248,68 @@ test('unify_singleton_intersection_sets_exact_value_and_removes_attributes_v', [
   (X \== Z ; Y \== Z ; get_attr(X, term_order, _) ; get_attr(Y, term_order, _)).
 
 test('unify_singleton_intersection2_sets_exact_value_and_removes_attributes_v', [ fail ]) :-
-  term_indomain(X, [const(1), variable(Z)]),
-  term_indomain(Y, [variable(Z), const(3)]),
+  clp_term:term_indomain(X, [const(1), variable(Z)]),
+  clp_term:term_indomain(Y, [variable(Z), const(3)]),
   X = Y,
   (X \== Z ; Y \== Z ; get_attr(X, term_order, _) ; get_attr(Y, term_order, _)).
 
 test('unify_allterms_allterms', [ fail ]) :-
-  is_term(X),
-  is_term(Y),
+  clp_term:is_term(X),
+  clp_term:is_term(Y),
   X = Y,
   \+ (get_attr(X, term_order, all_terms), get_attr(Y, term_order, all_terms)).
 
 test('unify_allterms_termsfrom_c', [ fail ]) :-
-  is_term(X),
+  clp_term:is_term(X),
   term_at_least(Y, 1),
   X = Y,
   \+ get_attr(X, term_order, terms_from(const(1))).
 
 test('unify_allterms_termsfrom_v', [ fail ]) :-
-  is_term(X),
+  clp_term:is_term(X),
   term_at_least(Y, Z),
   X = Y,
   \+ get_attr(X, term_order, terms_from(variable(Z))).
 
 test('unify_allterms_termsto_c', [ fail ]) :-
-  is_term(X),
+  clp_term:is_term(X),
   term_at_most(Y, 1),
   X = Y,
   \+ get_attr(X, term_order, terms_to(const(1))).
 
 test('unify_allterms_termsto_v', [ fail ]) :-
-  is_term(X),
+  clp_term:is_term(X),
   term_at_most(Y, Z),
   X = Y,
   \+ get_attr(X, term_order, terms_to(variable(Z))).
 
 test('unify_allterms_int_c_c', [ fail ]) :-
-  is_term(X),
+  clp_term:is_term(X),
   term_at_least(Y, 1), term_at_most(Y, 2),
   X = Y,
   \+ get_attr(X, term_order, [const(1), const(2)]).
 
 test('unify_allterms_int_c_v', [ fail ]) :-
-  is_term(X),
+  clp_term:is_term(X),
   term_at_least(Y, 1), term_at_most(Y, U), dif(1, U),
   X = Y,
   \+ get_attr(X, term_order, [const(1), variable(U)]).
 
 test('unify_allterms_int_v_c', [ fail ]) :-
-  is_term(X),
+  clp_term:is_term(X),
   term_at_least(Y, L), term_at_most(Y, 2), dif(L, 2),
   X = Y,
   \+ get_attr(X, term_order, [variable(L), const(2)]).
 
 test('unify_allterms_int_v_v', [ fail ]) :-
-  is_term(X),
+  clp_term:is_term(X),
   term_at_least(Y, L), term_at_most(Y, U), dif(L, U),
   X = Y,
   \+ get_attr(X, term_order, [variable(L), variable(U)]).
 
 test('unify_termsfrom_allterms', [ fail ]) :-
   term_at_least(X, 1),
-  is_term(Y),
+  clp_term:is_term(Y),
   X = Y,
   \+ get_attr(Y, term_order, terms_from(const(1))).
 
@@ -1325,7 +1324,7 @@ test('unify_termsfrom_termsfrom_c_v', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_from_from(Dom1, Dom2, Expected)), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_from_from(Dom1, Dom2, Expected)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -1334,7 +1333,7 @@ test('unify_termsfrom_termsfrom_v_c', [ fail ]) :-
   term_at_least(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, terms_intersection_from_from(Dom1, Dom2, Expected), Expecteds),
+  setof(X-Y-Expected, clp_term:terms_intersection_from_from(Dom1, Dom2, Expected), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -1343,7 +1342,7 @@ test('unify_termsfrom_termsfrom_v_v', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, terms_intersection_from_from(Dom1, Dom2, Expected), Expecteds),
+  setof(X-Y-Expected, clp_term:terms_intersection_from_from(Dom1, Dom2, Expected), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -1358,7 +1357,7 @@ test('unify_termsfrom_termsto_c_v', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_from_to(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (clp_term:terms_intersection_from_to(Dom1, Dom2, Expected),
                    \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   Expecteds = [_-_-Es], Actuals = [_-_-As],
@@ -1369,7 +1368,7 @@ test('unify_termsfrom_termsto_c_v_singleton', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_from_to(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_from_to(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1378,7 +1377,7 @@ test('unify_termsfrom_termsto_v_c', [ fail ]) :-
   term_at_most(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_from_to(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (clp_term:terms_intersection_from_to(Dom1, Dom2, Expected),
         \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -1388,7 +1387,7 @@ test('unify_termsfrom_termsto_v_c_singleton', [ fail ]) :-
   term_at_most(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_from_to(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_from_to(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1397,7 +1396,7 @@ test('unify_termsfrom_termsto_v_v', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_from_to(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (clp_term:terms_intersection_from_to(Dom1, Dom2, Expected),
         \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -1407,7 +1406,7 @@ test('unify_termsfrom_termsto_v_v_singleton', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_from_to(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_from_to(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1422,7 +1421,7 @@ test('unify_termsfrom_int_c_[c,v]', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_from_int(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (clp_term:terms_intersection_from_int(Dom1, Dom2, Expected),
                        \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   Expecteds = [_-_-Es], Actuals = [_-_-As],
@@ -1433,7 +1432,7 @@ test('unify_termsfrom_int_c_[c,v]_singleton', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_from_int(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_from_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1442,7 +1441,7 @@ test('unify_termsfrom_int_c_[v,c]', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, terms_intersection_from_int(Dom1, Dom2, Expected), Expecteds),
+  setof(X-Y-Expected, clp_term:terms_intersection_from_int(Dom1, Dom2, Expected), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1451,7 +1450,7 @@ test('unify_termsfrom_int_c_[v,v]', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_from_int(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (clp_term:terms_intersection_from_int(Dom1, Dom2, Expected),
                        \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   Expecteds = [_-_-Es1, _-_-Es2], Actuals = [_-_-As1, _-_-As2],
@@ -1462,7 +1461,7 @@ test('unify_termsfrom_int_c_[v,v]_singleton', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_from_int(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_from_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1471,7 +1470,7 @@ test('unify_termsfrom_int_v_[c,c]', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_from_int(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (clp_term:terms_intersection_from_int(Dom1, Dom2, Expected),
         \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -1481,7 +1480,7 @@ test('unify_termsfrom_int_v_[c,c]_singleton', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_from_int(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_from_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1490,7 +1489,7 @@ test('unify_termsfrom_int_v_[c,v]', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_from_int(Dom1, Dom2, Expected), 
+  setof(X-Y-Expected, (clp_term:terms_intersection_from_int(Dom1, Dom2, Expected), 
         \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -1500,7 +1499,7 @@ test('unify_termsfrom_int_v_[c,v]_singleton', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_from_int(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_from_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1509,7 +1508,7 @@ test('unify_termsfrom_int_v_[v,c]', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_from_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_from_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1518,7 +1517,7 @@ test('unify_termsfrom_int_v_[v,c]_singleton', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_from_int(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_from_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1527,7 +1526,7 @@ test('unify_termsfrom_int_v_[v,v]', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_from_int(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (clp_term:terms_intersection_from_int(Dom1, Dom2, Expected),
                    \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -1537,13 +1536,13 @@ test('unify_termsfrom_int_v_[v,v]_singleton', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_from_int(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_from_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
 test('unify_termsto_allterms', [ fail ]) :-
   term_at_most(X, 1),
-  is_term(Y),
+  clp_term:is_term(Y),
   X = Y,
   \+ get_attr(Y, term_order, terms_to(const(1))).
 
@@ -1552,7 +1551,7 @@ test('unify_termsto_termsfrom_c_c', [ fail ]) :-
   term_at_least(Y, 1),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_to_int(Dom1, Dom2, Expected)), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_to_int(Dom1, Dom2, Expected)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1561,7 +1560,7 @@ test('unify_termsto_termsfrom_c_v', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_to_from(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_to_from(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1570,7 +1569,7 @@ test('unify_termsto_termsfrom_c_v_singleton', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_to_from(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_to_from(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1579,7 +1578,7 @@ test('unify_termsto_termsfrom_v_c', [ fail ]) :-
   term_at_least(Y, 1),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_to_from(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_to_from(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   Expecteds = [_-_-Es], Actuals = [_-_-As],
   \+ Es = As.
@@ -1589,7 +1588,7 @@ test('unify_termsto_termsfrom_v_c_singleton', [ fail ]) :-
   term_at_least(Y, 1),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_to_from(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_to_from(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1598,7 +1597,7 @@ test('unify_termsto_termsfrom_v_v', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_to_from(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_to_from(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1607,7 +1606,7 @@ test('unify_termsto_termsfrom_v_v_singleton', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_to_from(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_to_from(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1616,7 +1615,7 @@ test('unify_termsto_termsto_c_c', [ fail ]) :-
   term_at_most(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_to_to(Dom1, Dom2, Expected)), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_to_to(Dom1, Dom2, Expected)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1625,7 +1624,7 @@ test('unify_termsto_termsto_c_v', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, terms_intersection_to_to(Dom1, Dom2, Expected), Expecteds),
+  setof(X-Y-Expected, clp_term:terms_intersection_to_to(Dom1, Dom2, Expected), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -1634,7 +1633,7 @@ test('unify_termsto_termsto_v_c', [ fail ]) :-
   term_at_most(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, terms_intersection_to_to(Dom1, Dom2, Expected), Expecteds),
+  setof(X-Y-Expected, clp_term:terms_intersection_to_to(Dom1, Dom2, Expected), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -1643,7 +1642,7 @@ test('unify_termsto_termsto_v_v', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, terms_intersection_to_to(Dom1, Dom2, Expected), Expecteds),
+  setof(X-Y-Expected, clp_term:terms_intersection_to_to(Dom1, Dom2, Expected), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1652,7 +1651,7 @@ test('unify_termsto_int_c_[c,c]', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, terms_intersection_to_int(Dom1, Dom2, Expected), Expecteds),
+  setof(X-Y-Expected, clp_term:terms_intersection_to_int(Dom1, Dom2, Expected), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1661,7 +1660,7 @@ test('unify_termsto_int_c_[c,v]', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, terms_intersection_to_int(Dom1, Dom2, Expected), Expecteds),
+  setof(X-Y-Expected, clp_term:terms_intersection_to_int(Dom1, Dom2, Expected), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1670,7 +1669,7 @@ test('unify_termsto_int_c_[v,c]', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2), Dom2 = [_,_],
-  setof(X-Y-Expected, (terms_intersection_to_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_to_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1679,7 +1678,7 @@ test('unify_termsto_int_c_[v,c]_singleton', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2), Dom2 = [_,_],
-  terms_intersection_to_int(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_to_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1688,7 +1687,7 @@ test('unify_termsto_int_c_[v,v]', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_to_int(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (clp_term:terms_intersection_to_int(Dom1, Dom2, Expected),
                        \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -1698,7 +1697,7 @@ test('unify_termsto_int_c_[v,v]_singleton', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2), Dom2 = [_,_],
-  terms_intersection_to_int(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_to_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1707,7 +1706,7 @@ test('unify_termsto_int_v_[c,c]', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_to_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_to_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1716,7 +1715,7 @@ test('unify_termsto_int_v_[c,c]_singleton', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_to_int(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_to_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1725,7 +1724,7 @@ test('unify_termsto_int_v_[c,v]', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_to_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_to_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1734,7 +1733,7 @@ test('unify_termsto_int_v_[c,v]_singleton', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_to_int(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_to_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1743,7 +1742,7 @@ test('unify_termsto_int_v_[v,c]', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_to_int(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (clp_term:terms_intersection_to_int(Dom1, Dom2, Expected),
                        \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -1753,7 +1752,7 @@ test('unify_termsto_int_v_[v,c]_singleton', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_to_int(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_to_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1762,7 +1761,7 @@ test('unify_termsto_int_v_[v,v]', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_to_int(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (clp_term:terms_intersection_to_int(Dom1, Dom2, Expected),
                        \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -1772,13 +1771,13 @@ test('unify_termsto_int_v_[v,v]_singleton', [ fail ]) :-
   term_at_least(Y, _), term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_to_int(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_to_int(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
 test('unify_int_allterms_[c,c]', [ fail ]) :-
   term_at_least(X, 1), term_at_most(X, 3),
-  is_term(Y),
+  clp_term:is_term(Y),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
   setof(X-Y-Expected, (terms_dom_intersection(Dom1, Dom2, Expected)), Expecteds),
@@ -1787,7 +1786,7 @@ test('unify_int_allterms_[c,c]', [ fail ]) :-
 
 test('unify_int_allterms_[c,v]', [ fail ]) :-
   term_at_least(X, 1), term_at_most(X, _),
-  is_term(Y),
+  clp_term:is_term(Y),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
   setof(X-Y-Expected, (terms_dom_intersection(Dom1, Dom2, Expected)), Expecteds),
@@ -1796,7 +1795,7 @@ test('unify_int_allterms_[c,v]', [ fail ]) :-
 
 test('unify_int_allterms_[v,c]', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, 3),
-  is_term(Y),
+  clp_term:is_term(Y),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
   setof(X-Y-Expected, (terms_dom_intersection(Dom1, Dom2, Expected)), Expecteds),
@@ -1805,7 +1804,7 @@ test('unify_int_allterms_[v,c]', [ fail ]) :-
 
 test('unify_int_allterms_[v,v]', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, _),
-  is_term(Y),
+  clp_term:is_term(Y),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
   setof(X-Y-Expected, (terms_dom_intersection(Dom1, Dom2, Expected)), Expecteds),
@@ -1826,7 +1825,7 @@ test('unify_int_termsfrom_[c,c]_v', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_from(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_from(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1835,7 +1834,7 @@ test('unify_int_termsfrom_[c,c]_v_singleton', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_int_from(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_int_from(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1844,7 +1843,7 @@ test('unify_int_termsfrom_[c,v]_c', [ fail ]) :-
   term_at_least(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_from(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_from(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   Expecteds = [_-_-Es], Actuals = [_-_-As],
   \+ Es = As.
@@ -1854,7 +1853,7 @@ test('unify_int_termsfrom_[c,v]_c_singleton', [ fail ]) :-
   term_at_least(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_int_from(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_int_from(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1863,7 +1862,7 @@ test('unify_int_termsfrom_[c,v]_v', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_from(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_from(Dom1, Dom2, Expected),
                    \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -1873,7 +1872,7 @@ test('unify_int_termsfrom_[c,v]_v_singleton', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_int_from(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_int_from(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1882,7 +1881,7 @@ test('unify_int_termsfrom_[v,c]_c', [ fail ]) :-
   term_at_least(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, terms_intersection_int_from(Dom1, Dom2, Expected), Expecteds),
+  setof(X-Y-Expected, clp_term:terms_intersection_int_from(Dom1, Dom2, Expected), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1891,7 +1890,7 @@ test('unify_int_termsfrom_[v,c]_v', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_from(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_from(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1900,7 +1899,7 @@ test('unify_int_termsfrom_[v,c]_v_singleton', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_int_from(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_int_from(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1909,7 +1908,7 @@ test('unify_int_termsfrom_[v,v]_c', [ fail ]) :-
   term_at_least(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_from(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_from(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1918,7 +1917,7 @@ test('unify_int_termsfrom_[v,v]_c_singleton', [ fail ]) :-
   term_at_least(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_int_from(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_int_from(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1927,7 +1926,7 @@ test('unify_int_termsfrom_[v,v]_v', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_from(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_from(Dom1, Dom2, Expected),
                        \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -1937,7 +1936,7 @@ test('unify_int_termsfrom_[v,v]_v_singleton', [ fail ]) :-
   term_at_least(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_int_from(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_int_from(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1946,7 +1945,7 @@ test('unify_int_termsto_[c,c]_c', [ fail ]) :-
   term_at_most(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_to(Dom1, Dom2, Expected)), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_to(Dom1, Dom2, Expected)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1955,7 +1954,7 @@ test('unify_int_termsto_[c,c]_v', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_to(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_to(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1964,7 +1963,7 @@ test('unify_int_termsto_[c,c]_v_singleton', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_int_to(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_int_to(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1973,7 +1972,7 @@ test('unify_int_termsto_[c,v]_c', [ fail ]) :-
   term_at_most(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, terms_intersection_int_to(Dom1, Dom2, Expected), Expecteds),
+  setof(X-Y-Expected, clp_term:terms_intersection_int_to(Dom1, Dom2, Expected), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1982,7 +1981,7 @@ test('unify_int_termsto_[c,v]_v', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_to(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_to(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -1991,7 +1990,7 @@ test('unify_int_termsto_[c,v]_v_singleton', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_int_to(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_int_to(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -2000,7 +1999,7 @@ test('unify_int_termsto_[v,c]_c', [ fail ]) :-
   term_at_most(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_to(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_to(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -2009,7 +2008,7 @@ test('unify_int_termsto_[v,c]_c_singleton', [ fail ]) :-
   term_at_most(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_int_to(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_int_to(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -2018,7 +2017,7 @@ test('unify_int_termsto_[v,c]_v', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_to(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_to(Dom1, Dom2, Expected),
                    \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -2028,7 +2027,7 @@ test('unify_int_termsto_[v,c]_v_singleton', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_int_to(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_int_to(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -2037,7 +2036,7 @@ test('unify_int_termsto_[v,v]_c', [ fail ]) :-
   term_at_most(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_to(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_to(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
 
@@ -2046,7 +2045,7 @@ test('unify_int_termsto_[v,v]_c_singleton', [ fail ]) :-
   term_at_most(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_int_to(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_int_to(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -2055,7 +2054,7 @@ test('unify_int_termsto_[v,v]_v', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_to(Dom1, Dom2, Expected),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_to(Dom1, Dom2, Expected),
                    \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -2065,7 +2064,7 @@ test('unify_int_termsto_[v,v]_v_singleton', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection_int_to(Dom1, Dom2, singleton(S)),
+  clp_term:terms_intersection_int_to(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -2079,7 +2078,7 @@ test('unify_int_int_[c,c]_[c,v]', [ fail ]) :-
   term_at_least(X, 1), term_at_most(X, 3),
   term_at_least(Y, 2), term_at_most(Y, _),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, terms_intersection_int_int(Dom1, Dom2, Expected), Expecteds),
+  setof(X-Y-Expected, clp_term:terms_intersection_int_int(Dom1, Dom2, Expected), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2087,7 +2086,7 @@ test('unify_int_int_[c,c]_[v,c]', [ fail ]) :-
   term_at_least(X, 1), term_at_most(X, 3),
   term_at_least(Y, _), term_at_most(Y, 4),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2095,7 +2094,7 @@ test('unify_int_int_[c,c]_[v,v]', [ fail ]) :-
   term_at_least(X, 1), term_at_most(X, 3),
   term_at_least(Y, _), term_at_most(Y, _),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2103,7 +2102,7 @@ test('unify_int_int_[c,v]_[c,c]', [ fail ]) :-
   term_at_least(X, 1), term_at_most(X, _),
   term_at_least(Y, 2), term_at_most(Y, 4),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2111,7 +2110,7 @@ test('unify_int_int_[c,v]_[c,v]', [ fail ]) :-
   term_at_least(X, 1), term_at_most(X, _),
   term_at_least(Y, 2), term_at_most(Y, _),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2119,7 +2118,7 @@ test('unify_int_int_[c,v]_[v,c]', [ fail ]) :-
   term_at_least(X, 1), term_at_most(X, _),
   term_at_least(Y, _), term_at_most(Y, 4),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2127,7 +2126,7 @@ test('unify_int_int_[c,v]_[v,v]', [ fail ]) :-
   term_at_least(X, 1), term_at_most(X, _),
   term_at_least(Y, _), term_at_most(Y, 4),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2135,7 +2134,7 @@ test('unify_int_int_[v,c]_[c,c]', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, 3),
   term_at_least(Y, 2), term_at_most(Y, 4),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2143,7 +2142,7 @@ test('unify_int_int_[v,c]_[c,v]', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, 3),
   term_at_least(Y, 2), term_at_most(Y, _),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2151,7 +2150,7 @@ test('unify_int_int_[v,c]_[v,c]', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, 3),
   term_at_least(Y, _), term_at_most(Y, 4),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2159,7 +2158,7 @@ test('unify_int_int_[v,c]_[v,v]', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, 3),
   term_at_least(Y, _), term_at_most(Y, _),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2167,7 +2166,7 @@ test('unify_int_int_[v,v]_[c,c]', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, _),
   term_at_least(Y, 2), term_at_most(Y, 4),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2175,7 +2174,7 @@ test('unify_int_int_[v,v]_[c,v]', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, _),
   term_at_least(Y, 2), term_at_most(Y, _),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2183,7 +2182,7 @@ test('unify_int_int_[v,v]_[v,c]', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, _),
   term_at_least(Y, _), term_at_most(Y, 4),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2191,7 +2190,7 @@ test('unify_int_int_[v,v]_[v,v]', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, _),
   term_at_least(Y, _), term_at_most(Y, _),
   get_attr(X, term_order, Dom1), get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
+  setof(X-Y-Expected, (clp_term:terms_intersection_int_int(Dom1, Dom2, Expected), \+ Expected == empty), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ (subset(Expecteds, Actuals), subset(Actuals, Expecteds)).
 
@@ -2206,7 +2205,7 @@ test('unify_free_attr_sets_domain', [ fail ]) :-
   \+ Actuals = [X-Y-[const(2), const(4)]].
 
 test('unify_allterms_unifies_with_any') :-
-  is_term(X),
+  clp_term:is_term(X),
   X = a.
 
 test('unify_termsfrom_const_unifies_indomain') :-
@@ -2271,37 +2270,36 @@ test('unify_int_[v,v]_unifies_indomain', [ fail ]) :-
 
 % Tests for attribute_termorder_goals/3
 test('attribute_termorder_goals_from_c') :-
-  attribute_termorder_goals(Term, terms_from(const(1)), ResidualGoals),
+  clp_term:attribute_termorder_goals(Term, terms_from(const(1)), ResidualGoals),
   ResidualGoals == [term_at_least(Term, 1)].
 
 test('attribute_termorder_goals_from_v') :-
-  attribute_termorder_goals(Term, terms_from(variable(X)), ResidualGoals),
+  clp_term:attribute_termorder_goals(Term, terms_from(variable(X)), ResidualGoals),
   ResidualGoals == [term_at_least(Term, X)].
 
 test('attribute_termorder_goals_to_c') :-
-  attribute_termorder_goals(Term, terms_to(const(2)), ResidualGoals),
+  clp_term:attribute_termorder_goals(Term, terms_to(const(2)), ResidualGoals),
   ResidualGoals == [term_at_most(Term, 2)].
 
 test('attribute_termorder_goals_to_v') :-
-  attribute_termorder_goals(Term, terms_to(variable(Y)), ResidualGoals),
+  clp_term:attribute_termorder_goals(Term, terms_to(variable(Y)), ResidualGoals),
   ResidualGoals == [term_at_most(Term, Y)].
 
 test('attribute_termorder_goals_int_c_c') :-
-  attribute_termorder_goals(Term, [const(1), const(2)], ResidualGoals),
+  clp_term:attribute_termorder_goals(Term, [const(1), const(2)], ResidualGoals),
   ResidualGoals == [term_at_least(Term, 1), term_at_most(Term, 2)].
 
 test('attribute_termorder_goals_int_c_v') :-
-  attribute_termorder_goals(Term, [const(1), variable(Y)], ResidualGoals),
+  clp_term:attribute_termorder_goals(Term, [const(1), variable(Y)], ResidualGoals),
   ResidualGoals == [term_at_least(Term, 1), term_at_most(Term, Y)].
 
 test('attribute_termorder_goals_int_v_c') :-
-  attribute_termorder_goals(Term, [variable(X), const(2)], ResidualGoals),
+  clp_term:attribute_termorder_goals(Term, [variable(X), const(2)], ResidualGoals),
   ResidualGoals == [term_at_least(Term, X), term_at_most(Term, 2)].
 
 test('attribute_termorder_goals_int_v_v') :-
-  attribute_termorder_goals(Term, [variable(X), variable(Y)], ResidualGoals),
+  clp_term:attribute_termorder_goals(Term, [variable(X), variable(Y)], ResidualGoals),
   ResidualGoals == [term_at_least(Term, X), term_at_most(Term, Y)].
-
 
 :- end_tests(clp_term).
 
