@@ -1,10 +1,7 @@
 :- module(clp_term,
   [ term_at_least/2,
     term_at_most/2,
-    terms_dom_intersection/3,
-    attr_unify_hook/2,
-    attribute_termorder_goals/3,
-    attribute_goals/3
+    terms_dom_intersection/3
   ]).
 
 % term_indomain(-Term, +Dom) is det.
