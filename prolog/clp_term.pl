@@ -13,11 +13,11 @@ term_indomain(Term, Dom) :-
   (  nonvar(Term)
   -> throw(error(uninstantiation_error(Term), "Term enumeration is not supported by term_indomain/2"))
   ;  var(Dom)
-  -> get_attr(Term, term_order, Dom)
-  ;  (  get_attr(Term, term_order, Dom1) % already attributed?
+  -> get_attr(Term, clp_term, Dom)
+  ;  (  get_attr(Term, clp_term, Dom1) % already attributed?
      -> terms_dom_intersection(Dom, Dom1, NewDom),
-        put_attr(Term, term_order, NewDom)
-     ;  put_attr(Term, term_order, Dom)
+        put_attr(Term, clp_term, NewDom)
+     ;  put_attr(Term, clp_term, Dom)
      )
   ).
 
@@ -386,17 +386,17 @@ terms_dom_intersection(Dom1, Dom2, Intersection) :-
      )
   ).
   
-% Hook for term unification in the new "term_order" domain 
+% Hook for term unification in the new "clp_term" domain 
 attr_unify_hook(Dom1, Term2) :-
-  (  get_attr(Term2, term_order, Dom2)      % Term2 is already attributed
+  (  get_attr(Term2, clp_term, Dom2)      % Term2 is already attributed
   -> terms_dom_intersection(Dom1, Dom2, NewDom),
      (  NewDom == empty                     % Fail to unify if resulting domain is empty
      -> fail
      ;  NewDom = singleton(Value)           % New domain is a singleton, so delete attribute and unify normally 
      -> arg(1, Value, Value1),
-        del_attr(Term2, term_order),
+        del_attr(Term2, clp_term),
         Term2 = Value1
-     ;  put_attr(Term2, term_order, NewDom) % Otherwise, just set the new domain
+     ;  put_attr(Term2, clp_term, NewDom) % Otherwise, just set the new domain
      )
   ;  (  nonvar(Term2)
      -> (  Dom1 == all_terms                % Term2 is not a variable, so check if it belongs to Dom1
@@ -443,7 +443,7 @@ attribute_termorder_goals(Term, Dom, ResidualGoals) :-
   ).
 
 attribute_goals(Term) -->
-  { get_attr(Term, term_order, Dom0),
+  { get_attr(Term, clp_term, Dom0),
     dom_normalized(Dom0, Dom1),
     attribute_termorder_goals(Term, Dom1, ResidualGoals) 
   },
