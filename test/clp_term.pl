@@ -94,13 +94,13 @@ test('term_normalized_v_v_-') :-
   Term == variable(X).
 
 test('term_normalized_uninst_const_-_+', [ fail ]) :-
-  term_normalized(_, const(a)). 
+  term_normalized(_, const(a)).
 
 test('term_normalized_uninst_var_-_+', [ fail ]) :-
-  term_normalized(_, variable(_)). 
+  term_normalized(_, variable(_)).
 
 test('term_normalized_uninst_-_-', [ fail ]) :-
-  term_normalized(_, _). 
+  term_normalized(_, _).
 
 test('term_normalized_naked_const_+_+', [ fail ]) :-
   term_normalized(a, a).
@@ -438,87 +438,87 @@ test('dom_normalized_+_-_uninstantiated_endpoint', [ fail ]) :-
 
 % Tests for terms_intersection (from-from case)
 test('terms_from_from_intersection_c_c_>=') :-
-  setof(I, terms_intersection(terms_from(const(y)), terms_from(const(x)), I), [terms_from(const(y))]).
+  setof(I, terms_intersection_from_from(terms_from(const(y)), terms_from(const(x)), I), [terms_from(const(y))]).
 
 test('terms_from_from_intersection_c_c_<') :-
-  setof(I, terms_intersection(terms_from(const(x)), terms_from(const(y)), I), [terms_from(const(y))]).
+  setof(I, terms_intersection_from_from(terms_from(const(x)), terms_from(const(y)), I), [terms_from(const(y))]).
 
 test('terms_from_from_intersection_c_v') :-
-  setof(Y-I, terms_intersection(terms_from(const(x)), terms_from(variable(Y)), I), Ans),
+  setof(Y-I, terms_intersection_from_from(terms_from(const(x)), terms_from(variable(Y)), I), Ans),
   Ans = [Y-terms_from(variable(Y)), Y-terms_from(const(x))].
 
 test('terms_from_from_intersection_v_c') :-
-  setof(X-I, terms_intersection(terms_from(variable(X)), terms_from(const(y)), I), Ans),
+  setof(X-I, terms_intersection_from_from(terms_from(variable(X)), terms_from(const(y)), I), Ans),
   Ans = [X-terms_from(const(y)), X-terms_from(variable(X))].
 
 test('terms_from_from_intersection_v_v') :-
-  setof(X-Y-I, terms_intersection(terms_from(variable(X)), terms_from(variable(Y)), I), Ans),
+  setof(X-Y-I, terms_intersection_from_from(terms_from(variable(X)), terms_from(variable(Y)), I), Ans),
   Ans = [X-Y-terms_from(variable(X)), X-Y-terms_from(variable(Y))].
 
 
 % Tests for terms_intersection (to-to case)
 test('terms_to_to_intersection_c_c_>=') :-
-  setof(I, terms_intersection(terms_to(const(y)), terms_to(const(x)), I), [terms_to(const(x))]).
+  setof(I, terms_intersection_to_to(terms_to(const(y)), terms_to(const(x)), I), [terms_to(const(x))]).
 
 test('terms_to_to_intersection_c_c_<') :-
-  setof(I, terms_intersection(terms_to(const(x)), terms_to(const(y)), I), [terms_to(const(x))]).
+  setof(I, terms_intersection_to_to(terms_to(const(x)), terms_to(const(y)), I), [terms_to(const(x))]).
 
 test('terms_to_to_intersection_c_v') :-
-  setof(Y-I, terms_intersection(terms_to(const(x)), terms_to(variable(Y)), I), Ans),
+  setof(Y-I, terms_intersection_to_to(terms_to(const(x)), terms_to(variable(Y)), I), Ans),
   Ans = [Y-terms_to(variable(Y)), Y-terms_to(const(x))].
 
 test('terms_to_to_intersection_v_c') :-
-  setof(X-I, terms_intersection(terms_to(variable(X)), terms_to(const(y)), I), Ans),
+  setof(X-I, terms_intersection_to_to(terms_to(variable(X)), terms_to(const(y)), I), Ans),
   Ans = [X-terms_to(const(y)), X-terms_to(variable(X))].
 
 test('terms_to_to_intersection_v_v') :-
-  setof(X-Y-I, terms_intersection(terms_to(variable(X)), terms_to(variable(Y)), I), Ans),
+  setof(X-Y-I, terms_intersection_to_to(terms_to(variable(X)), terms_to(variable(Y)), I), Ans),
   Ans = [X-Y-terms_to(variable(X)), X-Y-terms_to(variable(Y))].
 
 
 % Tests for terms_intersection (from-to case)
 test('terms_from_to_intersection_c_c_=') :-
-  setof(I, terms_intersection(terms_from(const(x)), terms_to(const(x)), I), [singleton(const(x))]).
+  setof(I, terms_intersection_from_to(terms_from(const(x)), terms_to(const(x)), I), [singleton(const(x))]).
 
 test('terms_from_to_intersection_c_c_<') :-
-  setof(I, terms_intersection(terms_from(const(x)), terms_to(const(y)), I), [[const(x), const(y)]]).
+  setof(I, terms_intersection_from_to(terms_from(const(x)), terms_to(const(y)), I), [[const(x), const(y)]]).
 
 test('terms_from_to_intersection_c_c_>') :-
-  setof(I, terms_intersection(terms_from(const(y)), terms_to(const(x)), I), [empty]).
+  setof(I, terms_intersection_from_to(terms_from(const(y)), terms_to(const(x)), I), [empty]).
 
 test('terms_from_to_intersection_c_v') :-
-  setof(Y-I, terms_intersection(terms_from(const(x)), terms_to(variable(Y)), I), Ans),
+  setof(Y-I, terms_intersection_from_to(terms_from(const(x)), terms_to(variable(Y)), I), Ans),
   Ans = [Y-empty, Y-[const(x), variable(Y)], Y-singleton(const(x))].
 
 test('terms_from_to_intersection_c_v_unified') :-
-  setof(Y, terms_intersection(terms_from(const(x)), terms_to(variable(Y)), singleton(const(x))), [Y1]),
+  setof(Y, terms_intersection_from_to(terms_from(const(x)), terms_to(variable(Y)), singleton(const(x))), [Y1]),
   Y1 == x.
 
 test('terms_from_to_intersection_v_c') :-
-  setof(X-I, terms_intersection(terms_from(variable(X)), terms_to(const(y)), I), Ans),
+  setof(X-I, terms_intersection_from_to(terms_from(variable(X)), terms_to(const(y)), I), Ans),
   Ans = [X-empty, X-[variable(X), const(y)], X-singleton(const(y))].
 
 test('terms_from_to_intersection_v_c_unified') :-
-  setof(X, terms_intersection(terms_from(variable(X)), terms_to(const(y)), singleton(const(y))), [X1]),
+  setof(X, terms_intersection_from_to(terms_from(variable(X)), terms_to(const(y)), singleton(const(y))), [X1]),
   X1 == y.
 
 test('terms_from_to_intersection_v_v') :-
-  setof(X-Y-I, terms_intersection(terms_from(variable(X)), terms_to(variable(Y)), I), Ans),
+  setof(X-Y-I, terms_intersection_from_to(terms_from(variable(X)), terms_to(variable(Y)), I), Ans),
   Ans = [X-Y-empty, X-Y-[variable(X), variable(Y)], X-Y-singleton(variable(X))].
 
 test('terms_from_to_intersection_v_v_unified') :-
-  setof(X-Y, terms_intersection(terms_from(variable(X)), terms_to(variable(Y)), singleton(variable(X))), [X1-Y1]),
+  setof(X-Y, terms_intersection_from_to(terms_from(variable(X)), terms_to(variable(Y)), singleton(variable(X))), [X1-Y1]),
   X1 == Y1.
 
 test('terms_from_to_intersection_v_v_not_interval_if_identical', [ fail ]) :-
   X = Y,
-  terms_intersection(terms_from(variable(X)), terms_to(variable(Y)), [variable(X), variable(Y)]).
+  terms_intersection_from_to(terms_from(variable(X)), terms_to(variable(Y)), [variable(X), variable(Y)]).
 
 
 % Tests for terms_intersection (to-from case)
 test('terms_to_from_intersection_agrees_with_from_to') :-
-  setof(X-Y-ToFrom, terms_intersection(terms_to(variable(X)), terms_from(variable(Y)), ToFrom), ToFroms),
-  setof(X-Y-FromTo, terms_intersection(terms_from(variable(Y)), terms_to(variable(X)), FromTo), ToFroms).
+  setof(X-Y-ToFrom, terms_intersection_to_from(terms_to(variable(X)), terms_from(variable(Y)), ToFrom), ToFroms),
+  setof(X-Y-FromTo, terms_intersection_from_to(terms_from(variable(Y)), terms_to(variable(X)), FromTo), ToFroms).
 
 
 % Tests for terms_intersection (from-int case)
@@ -535,48 +535,48 @@ test('terms_to_from_intersection_agrees_with_from_to') :-
 % |   >   |   =   |  [z]                     |
 % |   >   |   >   |  []                      |
 test('terms_from_int_intersection_?_?') :-
-  setof(Y-Z-I, terms_intersection(terms_from(const(a)), [variable(Y), variable(Z)], I), Ans),
+  setof(Y-Z-I, terms_intersection_from_int(terms_from(const(a)), [variable(Y), variable(Z)], I), Ans),
   Ans = [Y-Z-empty, Y-Z-singleton(const(a)), Y-Z-[const(a), variable(Z)], Y-Z-[variable(Y), variable(Z)]].
 
 test('terms_from_int_intersection_?_?_unified') :-
-  setof(Z, terms_intersection(terms_from(const(a)), [variable(_), variable(Z)], singleton(const(a))), [Z1]),
+  setof(Z, terms_intersection_from_int(terms_from(const(a)), [variable(_), variable(Z)], singleton(const(a))), [Z1]),
   Z1 == a.
 
 test('terms_from_int_intersection_?_<') :-
-  setof(Y-I, terms_intersection(terms_from(const(a)), [variable(Y), const(c)], I), Ans),
+  setof(Y-I, terms_intersection_from_int(terms_from(const(a)), [variable(Y), const(c)], I), Ans),
   Ans = [Y-[const(a), const(c)], Y-[variable(Y), const(c)]].
 
 test('terms_from_int_intersection_?_=') :-
-  terms_intersection(terms_from(const(a)), [variable(_), const(a)], singleton(const(a))).
+  terms_intersection_from_int(terms_from(const(a)), [variable(_), const(a)], singleton(const(a))).
 
 test('terms_from_int_intersection_?_>') :-
-  terms_intersection(terms_from(const(b)), [variable(_), const(a)], empty).
+  terms_intersection_from_int(terms_from(const(b)), [variable(_), const(a)], empty).
 
 test('terms_from_int_intersection_<_?') :-
-  terms_intersection(terms_from(const(a)), [const(b), variable(Z)], [const(b), variable(Z)]).
+  terms_intersection_from_int(terms_from(const(a)), [const(b), variable(Z)], [const(b), variable(Z)]).
 
 test('terms_from_int_intersection_<_<') :-
-  terms_intersection(terms_from(const(a)), [const(b), const(c)], [const(b), const(c)]).
+  terms_intersection_from_int(terms_from(const(a)), [const(b), const(c)], [const(b), const(c)]).
 
 test('terms_from_int_intersection_=_<') :-
-  terms_intersection(terms_from(const(a)), [const(a), const(b)], [const(a), const(b)]).
+  terms_intersection_from_int(terms_from(const(a)), [const(a), const(b)], [const(a), const(b)]).
 
 test('terms_from_int_intersection_>_?') :-
-  setof(Z-I, terms_intersection(terms_from(const(b)), [const(a), variable(Z)], I), Ans),
+  setof(Z-I, terms_intersection_from_int(terms_from(const(b)), [const(a), variable(Z)], I), Ans),
   Ans = [Z-empty, Z-[const(b), variable(Z)], Z-singleton(const(b))].
 
 test('terms_from_int_intersection_>_?_unified') :-
-  setof(Z, terms_intersection(terms_from(const(b)), [const(a), variable(Z)], singleton(const(b))), [Z1]),
+  setof(Z, terms_intersection_from_int(terms_from(const(b)), [const(a), variable(Z)], singleton(const(b))), [Z1]),
   Z1 == b.
 
 test('terms_from_int_intersection_>_<') :-
-  terms_intersection(terms_from(const(b)), [const(a), const(c)], [const(b), const(c)]).
+  terms_intersection_from_int(terms_from(const(b)), [const(a), const(c)], [const(b), const(c)]).
 
 test('terms_from_int_intersection_>_=') :-
-  terms_intersection(terms_from(const(b)), [const(a), const(b)], singleton(const(b))).
+  terms_intersection_from_int(terms_from(const(b)), [const(a), const(b)], singleton(const(b))).
 
 test('terms_from_int_intersection_>_>') :-
-  terms_intersection(terms_from(const(c)), [const(a), const(b)], empty).
+  terms_intersection_from_int(terms_from(const(c)), [const(a), const(b)], empty).
 
 
 % Tests for terms_intersection (int-from case)
@@ -584,8 +584,8 @@ test('terms_int_from_intersection_agrees_with_from_int', [ fail ]) :-
   member(X, [const(1), variable(_)]),
   member(Y, [const(3), variable(_)]),
   member(Z, [const(2), variable(_)]),
-  setof(X-Y-Z-IntFrom, terms_intersection([X, Y], terms_from(Z), IntFrom), IntFroms),
-  \+ setof(X-Y-Z-FromInt, terms_intersection(terms_from(Z), [X, Y], FromInt), IntFroms).
+  setof(X-Y-Z-IntFrom, terms_intersection_int_from([X, Y], terms_from(Z), IntFrom), IntFroms),
+  \+ setof(X-Y-Z-FromInt, terms_intersection_from_int(terms_from(Z), [X, Y], FromInt), IntFroms).
 
 
 % Tests for terms_intersection (to-int case)
@@ -603,51 +603,51 @@ test('terms_int_from_intersection_agrees_with_from_int', [ fail ]) :-
 % |   >   |   =   | [y,z]                 |
 % |   >   |   >   | [y,z]                 |
 test('terms_to_int_intersection_?_?') :-
-  setof(Y-Z-I, terms_intersection(terms_to(const(a)), [variable(Y), variable(Z)], I), Ans),
+  setof(Y-Z-I, terms_intersection_to_int(terms_to(const(a)), [variable(Y), variable(Z)], I), Ans),
   Ans = [Y-Z-empty, Y-Z-[variable(Y), const(a)], Y-Z-[variable(Y), variable(Z)], Y-Z-singleton(const(a))].
 
 test('terms_to_int_intersection_?_?_unified') :-
-  setof(Y, terms_intersection(terms_to(const(a)), [variable(Y), variable(_)], singleton(const(a))), [Y1]),
+  setof(Y, terms_intersection_to_int(terms_to(const(a)), [variable(Y), variable(_)], singleton(const(a))), [Y1]),
   Y1 == a.
 
 test('terms_to_int_intersection_?_<') :-
-  setof(Y-I, terms_intersection(terms_to(const(a)), [variable(Y), const(c)], I), Ans),
+  setof(Y-I, terms_intersection_to_int(terms_to(const(a)), [variable(Y), const(c)], I), Ans),
   Ans = [Y-empty, Y-[variable(Y), const(a)], Y-singleton(const(a))].
 
 test('terms_to_int_intersection_?_<_unified') :-
-  setof(Y, terms_intersection(terms_to(const(a)), [variable(Y), const(c)], singleton(const(a))), [Y1]),
+  setof(Y, terms_intersection_to_int(terms_to(const(a)), [variable(Y), const(c)], singleton(const(a))), [Y1]),
   Y1 == a.
 
 test('terms_to_int_intersection_?_=') :-
-  terms_intersection(terms_to(const(a)), [variable(Y), const(a)], [variable(Y), const(a)]).
+  terms_intersection_to_int(terms_to(const(a)), [variable(Y), const(a)], [variable(Y), const(a)]).
 
 test('terms_to_int_intersection_?_>') :-
-  terms_intersection(terms_to(const(b)), [variable(Y), const(a)], [variable(Y), const(a)]).
+  terms_intersection_to_int(terms_to(const(b)), [variable(Y), const(a)], [variable(Y), const(a)]).
 
 test('terms_to_int_intersection_<_?') :-
-  terms_intersection(terms_to(const(a)), [const(b), variable(_)], empty).
+  terms_intersection_to_int(terms_to(const(a)), [const(b), variable(_)], empty).
 
 test('terms_to_int_intersection_<_<') :-
-  terms_intersection(terms_to(const(a)), [const(b), const(c)], empty).
+  terms_intersection_to_int(terms_to(const(a)), [const(b), const(c)], empty).
 
 test('terms_to_int_intersection_=_<') :-
-  terms_intersection(terms_to(const(a)), [const(a), const(b)], singleton(const(a))).
+  terms_intersection_to_int(terms_to(const(a)), [const(a), const(b)], singleton(const(a))).
 
 test('terms_to_int_intersection_=_?') :-
-  terms_intersection(terms_to(const(a)), [const(a), variable(_)], singleton(const(a))).
+  terms_intersection_to_int(terms_to(const(a)), [const(a), variable(_)], singleton(const(a))).
 
 test('terms_to_int_intersection_>_?') :-
-  setof(Z-I, terms_intersection(terms_to(const(b)), [const(a), variable(Z)], I), Ans),
+  setof(Z-I, terms_intersection_to_int(terms_to(const(b)), [const(a), variable(Z)], I), Ans),
   Ans = [Z-[const(a), variable(Z)], Z-[const(a), const(b)]].
 
 test('terms_to_int_intersection_>_<') :-
-  terms_intersection(terms_to(const(b)), [const(a), const(c)], [const(a), const(b)]).
+  terms_intersection_to_int(terms_to(const(b)), [const(a), const(c)], [const(a), const(b)]).
 
 test('terms_to_int_intersection_>_=') :-
-  terms_intersection(terms_to(const(b)), [const(a), const(b)], [const(a), const(b)]).
+  terms_intersection_to_int(terms_to(const(b)), [const(a), const(b)], [const(a), const(b)]).
 
 test('terms_to_int_intersection_>_>') :-
-  terms_intersection(terms_to(const(c)), [const(a), const(b)], [const(a), const(b)]).
+  terms_intersection_to_int(terms_to(const(c)), [const(a), const(b)], [const(a), const(b)]).
 
 
 % Tests for terms_intersection (int-to case)
@@ -655,8 +655,8 @@ test('terms_int_to_intersection_agrees_with_to_int', [ fail ]) :-
   member(X, [const(1), variable(_)]),
   member(Y, [const(3), variable(_)]),
   member(Z, [const(2), variable(_)]),
-  setof(X-Y-Z-IntTo, terms_intersection([X, Y], terms_to(Z), IntTo), IntTos),
-  \+ setof(X-Y-Z-ToInt, terms_intersection(terms_to(Z), [X, Y], ToInt), IntTos).
+  setof(X-Y-Z-IntTo, terms_intersection_int_to([X, Y], terms_to(Z), IntTo), IntTos),
+  \+ setof(X-Y-Z-ToInt, terms_intersection_to_int(terms_to(Z), [X, Y], ToInt), IntTos).
 
 
 % Tests for terms_intersection (int-int case)
@@ -666,54 +666,54 @@ test('terms_int_to_intersection_agrees_with_to_int', [ fail ]) :-
 % |     |     |  =  |     | [y]                        | [x[y]w]
 % |     |  =  |     |     | [x]                        | [z[x]y]
 test('terms_int_int_intersection_y<z') :-
-  terms_intersection([variable(_), const(b)], [const(c), variable(_)], empty).
+  terms_intersection_int_int([variable(_), const(b)], [const(c), variable(_)], empty).
 
 test('terms_int_int_intersection_x>w') :-
-  terms_intersection([const(b), variable(_)], [variable(_), const(a)], empty).
+  terms_intersection_int_int([const(b), variable(_)], [variable(_), const(a)], empty).
 
 test('terms_int_int_intersection_y=z') :-
-  terms_intersection([variable(_), const(b)], [const(b), variable(_)], singleton(const(b))).
+  terms_intersection_int_int([variable(_), const(b)], [const(b), variable(_)], singleton(const(b))).
 
 test('terms_int_int_intersection_x=w') :-
-  terms_intersection([const(a), variable(_)], [variable(_), const(a)], singleton(const(a))).
+  terms_intersection_int_int([const(a), variable(_)], [variable(_), const(a)], singleton(const(a))).
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
 % |  <  |  <  |  >  |  <  | [z,y]                      | [x[zy]w]
 % |  <  |  <  |  >  |  =  | [z,y]                      | [x[zy]y]
 % |  <  |  <  |  >  |  >  | [z,w]                      | [x[zw]y]
 test('terms_int_int_intersection_<_<_>_<') :-
-  terms_intersection([const(a), const(c)], [const(b), const(d)], [const(b), const(c)]).
+  terms_intersection_int_int([const(a), const(c)], [const(b), const(d)], [const(b), const(c)]).
 
 test('terms_int_int_intersection_<_<_>_=') :-
-  terms_intersection([const(a), const(c)], [const(b), const(c)], [const(b), const(c)]).
+  terms_intersection_int_int([const(a), const(c)], [const(b), const(c)], [const(b), const(c)]).
 
 test('terms_int_int_intersection_<_<_>_>') :-
-  terms_intersection([const(a), const(d)], [const(b), const(c)], [const(b), const(c)]).
+  terms_intersection_int_int([const(a), const(d)], [const(b), const(c)], [const(b), const(c)]).
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
 % |  <  |  <  |  ?  |  ?  | [z,w]; [z,y]; [z]; empty   | [x[zw]y] or [x[zy]w] or [xy][zw]
 test('terms_int_int_intersection_<_<_?_?') :-
-  setof(Y-I, terms_intersection([const(a), variable(Y)], [const(b), const(c)], I), Ans),
+  setof(Y-I, terms_intersection_int_int([const(a), variable(Y)], [const(b), const(c)], I), Ans),
   Ans = [Y-empty, Y-[const(b), variable(Y)], Y-[const(b), const(c)], Y-singleton(const(b))].
 
 test('terms_int_int_intersection_<_<_?_?_unified') :-
-  setof(Y, terms_intersection([const(a), variable(Y)], [const(b), const(c)], singleton(const(b))), [Y1]),
+  setof(Y, terms_intersection_int_int([const(a), variable(Y)], [const(b), const(c)], singleton(const(b))), [Y1]),
   Y1 == b.
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
 % |  <  |  ?  |  >  |  ?  | [z,w]; [z,y]               | [x[zw]y] or [x[zy]w]
 test('terms_int_int_intersection_<_?_>_?') :-
-  setof(W-I, terms_intersection([const(a), const(c)], [const(b), variable(W)], I), Ans),
+  setof(W-I, terms_intersection_int_int([const(a), const(c)], [const(b), variable(W)], I), Ans),
   Ans = [W-[const(b), const(c)], W-[const(b), variable(W)]].
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
 % |  <  |  ?  |  ?  |  ?  | [z,w]; [z,y]; [y]; empty   | [x[zw]y] or [x[zy]w] or [xy][zw]
 test('terms_int_int_intersection_<_?_?_?') :-
-  setof(Y-W-I, terms_intersection([const(a), variable(Y)], [const(c), variable(W)], I), Ans),
+  setof(Y-W-I, terms_intersection_int_int([const(a), variable(Y)], [const(c), variable(W)], I), Ans),
   Ans = [Y-W-empty, Y-W-[const(c), variable(Y)], Y-W-[const(c), variable(W)], Y-W-singleton(const(c))].
 
 test('terms_int_int_intersection_<_?_?_?_unified') :-
-  setof(Y, terms_intersection([const(a), variable(Y)], [const(c), variable(_)], singleton(const(c))), [Y1]),
+  setof(Y, terms_intersection_int_int([const(a), variable(Y)], [const(c), variable(_)], singleton(const(c))), [Y1]),
   Y1 == c.
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
@@ -721,30 +721,30 @@ test('terms_int_int_intersection_<_?_?_?_unified') :-
 % |  =  |  <  |  >  |  =  | [z,y]                      | [[zy]y]
 % |  =  |  <  |  >  |  >  | [z,w]                      | [[zw]y]
 test('terms_int_int_intersection_=_<_>_<') :-
-  terms_intersection([const(a), const(b)], [const(a), const(d)], [const(a), const(b)]).
+  terms_intersection_int_int([const(a), const(b)], [const(a), const(d)], [const(a), const(b)]).
 
 test('terms_int_int_intersection_=_<_>_=') :-
-  terms_intersection([const(a), const(d)], [const(a), const(d)], [const(a), const(d)]).
+  terms_intersection_int_int([const(a), const(d)], [const(a), const(d)], [const(a), const(d)]).
 
 test('terms_int_int_intersection_=_<_>_>') :-
-  terms_intersection([const(a), const(d)], [const(a), const(c)], [const(a), const(c)]).
+  terms_intersection_int_int([const(a), const(d)], [const(a), const(c)], [const(a), const(c)]).
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
 % |  =  |  <  |  ?  |  ?  | [z,w]; [z,y]               | [[zw]y] or [[zy]w]
 test('terms_int_int_intersection_=_<_?_?') :-
-  setof(Y-I, terms_intersection([const(a), variable(Y)], [const(a), const(d)], I), Ans),
+  setof(Y-I, terms_intersection_int_int([const(a), variable(Y)], [const(a), const(d)], I), Ans),
   Ans = [Y-[const(a), variable(Y)], Y-[const(a), const(d)]].
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
 % |  =  |  ?  |  >  |  ?  | [z,w]; [z,y]               | [[zw]y] or [[zy]w]
 test('terms_int_int_intersection_=_?_>_?') :-
-  setof(W-I, terms_intersection([const(a), const(b)], [const(a), variable(W)], I), Ans),
+  setof(W-I, terms_intersection_int_int([const(a), const(b)], [const(a), variable(W)], I), Ans),
   Ans = [W-[const(a), const(b)], W-[const(a), variable(W)]].
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
 % |  =  |  ?  |  ?  |  ?  | [z,w]; [z,y]               | [[zw]y] or [[zy]w]
 test('terms_int_int_intersection_=_?_?_?') :-
-  setof(Y-W-I, terms_intersection([const(a), variable(Y)], [const(a), variable(W)], I), Ans),
+  setof(Y-W-I, terms_intersection_int_int([const(a), variable(Y)], [const(a), variable(W)], I), Ans),
   Ans = [Y-W-[const(a), variable(Y)], Y-W-[const(a), variable(W)]].
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
@@ -752,38 +752,38 @@ test('terms_int_int_intersection_=_?_?_?') :-
 % |  >  |  <  |  >  |  =  | [x,y]                      | [z[xy]y]
 % |  >  |  <  |  >  |  >  | [x,w]                      | [z[xw]y]
 test('terms_int_int_intersection_>_<_>_<') :-
-  terms_intersection([const(b), const(c)], [const(a), const(d)], [const(b), const(c)]).
+  terms_intersection_int_int([const(b), const(c)], [const(a), const(d)], [const(b), const(c)]).
 
 test('terms_int_int_intersection_>_<_>_=') :-
-  terms_intersection([const(b), const(c)], [const(a), const(c)], [const(b), const(c)]).
+  terms_intersection_int_int([const(b), const(c)], [const(a), const(c)], [const(b), const(c)]).
 
 test('terms_int_int_intersection_>_<_>_>') :-
-  terms_intersection([const(b), const(d)], [const(a), const(c)], [const(b), const(c)]).
+  terms_intersection_int_int([const(b), const(d)], [const(a), const(c)], [const(b), const(c)]).
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
 % |  >  |  <  |  ?  |  ?  | [x,w]; [x,y]               | [z[xw]y] or [z[xy]w]
 test('terms_int_int_intersection_>_<_?_?') :-
-  setof(Y-I, terms_intersection([const(c), variable(Y)], [const(a), const(d)], I), Ans),
+  setof(Y-I, terms_intersection_int_int([const(c), variable(Y)], [const(a), const(d)], I), Ans),
   Ans = [Y-[const(c), variable(Y)], Y-[const(c), const(d)]].
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
 % |  >  |  ?  |  >  |  ?  | [x,w]; [x,y]; [x]; empty   | [z[xw]y] or [z[xy]w] or [zw][xy]
 test('terms_int_int_intersection_>_?_>_?') :-
-  setof(W-I, terms_intersection([const(b), const(c)], [const(a), variable(W)], I), Ans),
+  setof(W-I, terms_intersection_int_int([const(b), const(c)], [const(a), variable(W)], I), Ans),
   Ans = [W-empty, W-[const(b), const(c)], W-[const(b), variable(W)], W-singleton(const(b))].
 
 test('terms_int_int_intersection_>_?_>_?_unified') :-
-  setof(W, terms_intersection([const(b), const(c)], [const(a), variable(W)], singleton(const(b))), [W1]),
+  setof(W, terms_intersection_int_int([const(b), const(c)], [const(a), variable(W)], singleton(const(b))), [W1]),
   W1 == b.
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
 % |  >  |  ?  |  ?  |  ?  | [x,w]; [x,y]; [x]; empty   | [z[xw]y] or [z[xy]w] or [zw][xy]
 test('terms_int_int_intersection_>_?_?_?') :-
-  setof(Y-W-I, terms_intersection([const(c), variable(Y)], [const(a), variable(W)], I), Ans),
+  setof(Y-W-I, terms_intersection_int_int([const(c), variable(Y)], [const(a), variable(W)], I), Ans),
   Ans = [Y-W-empty, Y-W-singleton(const(c)), Y-W-[const(c), variable(Y)], Y-W-[const(c), variable(W)]].
 
 test('terms_int_int_intersection_>_?_?_?_unified') :-
-  setof(W, terms_intersection([const(c), variable(_)], [const(a), variable(W)], singleton(const(c))), [W1]),
+  setof(W, terms_intersection_int_int([const(c), variable(_)], [const(a), variable(W)], singleton(const(c))), [W1]),
   W1 == c.
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
@@ -793,28 +793,28 @@ test('terms_int_int_intersection_>_?_?_?_unified') :-
 % |  ?  |  <  |  ?  |  ?  | [z,w]; [x,w]; [z,y];       |
 %                         | [x,y]; [y]; empty          |
 test('terms_int_int_intersection_?_<_?_<') :-
-  setof(Z-I, terms_intersection([const(a), const(b)], [variable(Z), const(d)], I), Ans),
+  setof(Z-I, terms_intersection_int_int([const(a), const(b)], [variable(Z), const(d)], I), Ans),
   Ans = [Z-empty, Z-[const(a), const(b)], Z-[variable(Z), const(b)], Z-singleton(const(b))].
 
 test('terms_int_int_intersection_?_<_?_<_unified') :-
-  setof(Z, terms_intersection([const(a), const(b)], [variable(Z), const(d)], singleton(const(b))), [Z1]),
+  setof(Z, terms_intersection_int_int([const(a), const(b)], [variable(Z), const(d)], singleton(const(b))), [Z1]),
   Z1 == b.
 
 test('terms_int_int_intersection_?_<_?_=') :-
-  setof(Z-I, terms_intersection([const(a), const(b)], [variable(Z), const(b)], I), Ans),
+  setof(Z-I, terms_intersection_int_int([const(a), const(b)], [variable(Z), const(b)], I), Ans),
   Ans = [Z-[const(a), const(b)], Z-[variable(Z), const(b)]].
 
 test('terms_int_int_intersection_?_<_?_>') :-
-  setof(Z-I, terms_intersection([const(a), const(c)], [variable(Z), const(b)], I), Ans),
+  setof(Z-I, terms_intersection_int_int([const(a), const(c)], [variable(Z), const(b)], I), Ans),
   Ans = [Z-[const(a), const(b)], Z-[variable(Z), const(b)]].
 
 test('terms_int_int_intersection_?_<_?_?') :-
-  setof(Y-Z-I, terms_intersection([const(a), variable(Y)], [variable(Z), const(b)], I), Ans),
+  setof(Y-Z-I, terms_intersection_int_int([const(a), variable(Y)], [variable(Z), const(b)], I), Ans),
   Ans = [Y-Z-empty, Y-Z-singleton(variable(Y)), Y-Z-[const(a), variable(Y)], Y-Z-[variable(Z), variable(Y)],
          Y-Z-[const(a), const(b)], Y-Z-[variable(Z), const(b)]].
 
 test('terms_int_int_intersection_?_<_?_?_v') :-
-  setof(Y-Z, terms_intersection([const(a), variable(Y)], [variable(Z), const(b)], singleton(variable(Y))), [Y1-Z1]),
+  setof(Y-Z, terms_intersection_int_int([const(a), variable(Y)], [variable(Z), const(b)], singleton(variable(Y))), [Y1-Z1]),
   Y1 == Z1.
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
@@ -824,28 +824,28 @@ test('terms_int_int_intersection_?_<_?_?_v') :-
 % |  ?  |  ?  |  >  |  ?  | [z,w]; [x,w]; [z,y];       |
 %                         | [x,y]; [x]; empty          |
 test('terms_int_int_intersection_?_?_>_<') :-
-  setof(X-I, terms_intersection([variable(X), const(c)], [const(b), const(d)], I), Ans),
+  setof(X-I, terms_intersection_int_int([variable(X), const(c)], [const(b), const(d)], I), Ans),
   Ans = [X-[variable(X), const(c)], X-[const(b), const(c)]].
 
 test('terms_int_int_intersection_?_?_>_=') :-
-  setof(X-I, terms_intersection([variable(X), const(c)], [const(b), const(c)], I), Ans),
+  setof(X-I, terms_intersection_int_int([variable(X), const(c)], [const(b), const(c)], I), Ans),
   Ans = [X-[variable(X), const(c)], X-[const(b), const(c)]].
 
 test('terms_int_int_intersection_?_?_>_>') :-
-  setof(X-I, terms_intersection([variable(X), const(d)], [const(b), const(c)], I), Ans),
+  setof(X-I, terms_intersection_int_int([variable(X), const(d)], [const(b), const(c)], I), Ans),
   Ans = [X-empty, X-[variable(X), const(c)], X-[const(b), const(c)], X-singleton(const(c))].
 
 test('terms_int_int_intersection_?_?_>_>_X==c') :-
-  setof(X, terms_intersection([variable(X), const(d)], [const(b), const(c)], singleton(const(c))), [X1]),
+  setof(X, terms_intersection_int_int([variable(X), const(d)], [const(b), const(c)], singleton(const(c))), [X1]),
   X1 == c.
 
 test('terms_int_int_intersection_?_?_>_?') :-
-  setof(X-W-I, terms_intersection([variable(X), const(c)], [const(b), variable(W)], I), Ans),
-  Ans = [X-W-empty, X-W-singleton(variable(X)), X-W-[variable(X), const(c)], X-W-[const(b), const(c)], 
+  setof(X-W-I, terms_intersection_int_int([variable(X), const(c)], [const(b), variable(W)], I), Ans),
+  Ans = [X-W-empty, X-W-singleton(variable(X)), X-W-[variable(X), const(c)], X-W-[const(b), const(c)],
          X-W-[variable(X), variable(W)], X-W-[const(b), variable(W)]].
 
 test('terms_int_int_intersection_?_?_>_?_v') :-
-  setof(X-W, terms_intersection([variable(X), const(c)], [const(b), variable(W)], singleton(variable(X))), [X1-W1]),
+  setof(X-W, terms_intersection_int_int([variable(X), const(c)], [const(b), variable(W)], singleton(variable(X))), [X1-W1]),
   X1 == W1.
 
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
@@ -855,47 +855,47 @@ test('terms_int_int_intersection_?_?_>_?_v') :-
 % |  ?  |  ?  |  ?  |  ?  | [z,w]; [x,w]; [z,y];       |
 %                         | [x,y]; [x]; [y]; empty     |
 test('terms_int_int_intersection_?_?_?_<') :-
-  setof(X-Z-I, terms_intersection([variable(X), const(b)], [variable(Z), const(d)], I), Ans),
+  setof(X-Z-I, terms_intersection_int_int([variable(X), const(b)], [variable(Z), const(d)], I), Ans),
   Ans = [X-Z-empty, X-Z-singleton(const(b)), X-Z-[variable(X), const(b)], X-Z-[variable(Z), const(b)]].
 
 test('terms_int_int_intersection_?_?_?_<_Z==b') :-
-  setof(Z, terms_intersection([variable(_), const(b)], [variable(Z), const(d)], singleton(const(b))), [Z1]),
+  setof(Z, terms_intersection_int_int([variable(_), const(b)], [variable(Z), const(d)], singleton(const(b))), [Z1]),
   Z1 == b.
 
 test('terms_int_int_intersection_?_?_?_=') :-
-  setof(X-Z-I, terms_intersection([variable(X), const(b)], [variable(Z), const(b)], I), Ans),
+  setof(X-Z-I, terms_intersection_int_int([variable(X), const(b)], [variable(Z), const(b)], I), Ans),
   Ans = [X-Z-[variable(X), const(b)], X-Z-[variable(Z), const(b)]].
 
 test('terms_int_int_intersection_?_?_?_>') :-
-  setof(X-Z-I, terms_intersection([variable(X), const(d)], [variable(Z), const(b)], I), Ans),
+  setof(X-Z-I, terms_intersection_int_int([variable(X), const(d)], [variable(Z), const(b)], I), Ans),
   Ans = [X-Z-empty, X-Z-[variable(Z), const(b)], X-Z-[variable(X), const(b)], X-Z-singleton(const(b))].
 
 test('terms_int_int_intersection_?_?_?_>_X==b') :-
-  setof(X, terms_intersection([variable(X), const(d)], [variable(_), const(b)], singleton(const(b))), [X1]),
+  setof(X, terms_intersection_int_int([variable(X), const(d)], [variable(_), const(b)], singleton(const(b))), [X1]),
   X1 == b.
 
 test('terms_int_int_intersection_?_?_?_?') :-
-  setof(X-Y-Z-W-I, terms_intersection([variable(X), variable(Y)], [variable(Z), variable(W)], I), Ans),
-  Ans = [X-Y-Z-W-empty, X-Y-Z-W-singleton(variable(Y)), X-Y-Z-W-singleton(variable(X)), 
-         X-Y-Z-W-[variable(X), variable(Y)], X-Y-Z-W-[variable(Z), variable(Y)], 
+  setof(X-Y-Z-W-I, terms_intersection_int_int([variable(X), variable(Y)], [variable(Z), variable(W)], I), Ans),
+  Ans = [X-Y-Z-W-empty, X-Y-Z-W-singleton(variable(Y)), X-Y-Z-W-singleton(variable(X)),
+         X-Y-Z-W-[variable(X), variable(Y)], X-Y-Z-W-[variable(Z), variable(Y)],
          X-Y-Z-W-[variable(X), variable(W)], X-Y-Z-W-[variable(Z), variable(W)]].
 
 test('terms_int_int_intersection_?_?_?_?_x==w', [ fail ]) :-
-  terms_intersection([variable(X), variable(_)], [variable(_), variable(W)], singleton(variable(X))),
+  terms_intersection_int_int([variable(X), variable(_)], [variable(_), variable(W)], singleton(variable(X))),
   \+ X == W.
 
 test('terms_int_int_intersection_?_?_?_?_y==z', [ fail ]) :-
-  terms_intersection([variable(_), variable(Y)], [variable(Z), variable(_)], singleton(variable(Y))),
+  terms_intersection_int_int([variable(_), variable(Y)], [variable(Z), variable(_)], singleton(variable(Y))),
   \+ Y == Z.
 
 test('terms_int_int_intersection_y==z_shortcuts_to_singleton') :-
   Y = Z,
-  setof(Y-Z-I, terms_intersection([variable(_), variable(Y)], [variable(Z), variable(_)], I), Ans),
+  setof(Y-Z-I, terms_intersection_int_int([variable(_), variable(Y)], [variable(Z), variable(_)], I), Ans),
   Ans = [Y-Z-singleton(variable(Y))].
 
 test('terms_int_int_intersection_x==w_shortcuts_to_singleton') :-
   X = W,
-  setof(X-W-I, terms_intersection([variable(X), variable(_)], [variable(_), variable(W)], I), Ans),
+  setof(X-W-I, terms_intersection_int_int([variable(X), variable(_)], [variable(_), variable(W)], I), Ans),
   Ans = [X-W-singleton(variable(X))].
 
 
@@ -935,15 +935,15 @@ test('terms_dom_intersection_termsfrom_singleton_v_v') :-
 
 test('terms_dom_intersection_termsfrom_termsfrom') :-
   setof(X-Y-FromFrom1, terms_dom_intersection(terms_from(variable(X)), terms_from(variable(Y)), FromFrom1), FromFrom1s),
-  setof(X-Y-FromFrom2, terms_intersection(terms_from(variable(X)), terms_from(variable(Y)), FromFrom2), FromFrom1s).
+  setof(X-Y-FromFrom2, terms_intersection_from_from(terms_from(variable(X)), terms_from(variable(Y)), FromFrom2), FromFrom1s).
 
 test('terms_dom_intersection_termsfrom_termsto') :-
   setof(X-Y-FromTo1, terms_dom_intersection(terms_from(variable(X)), terms_to(variable(Y)), FromTo1), FromTo1s),
-  setof(X-Y-FromTo2, terms_intersection(terms_from(variable(X)), terms_to(variable(Y)), FromTo2), FromTo1s).
+  setof(X-Y-FromTo2, terms_intersection_from_to(terms_from(variable(X)), terms_to(variable(Y)), FromTo2), FromTo1s).
 
 test('terms_dom_intersection_termsfrom_int') :-
   setof(X-Y-Z-FromInt1, terms_dom_intersection(terms_from(variable(X)), [variable(Y),variable(Z)], FromInt1), FromInt1s),
-  setof(X-Y-Z-FromInt2, terms_intersection(terms_from(variable(X)), [variable(Y),variable(Z)], FromInt2), FromInt1s).
+  setof(X-Y-Z-FromInt2, terms_intersection_from_int(terms_from(variable(X)), [variable(Y),variable(Z)], FromInt2), FromInt1s).
 
 test('terms_dom_intersection_termsto_allterms') :-
   terms_dom_intersection(terms_to(variable(X)), all_terms, terms_to(variable(X))).
@@ -965,15 +965,15 @@ test('terms_dom_intersection_termsto_singleton_v_v') :-
 
 test('terms_dom_intersection_termsto_termsfrom') :-
   setof(X-Y-ToFrom1, terms_dom_intersection(terms_to(variable(X)), terms_from(variable(Y)), ToFrom1), ToFrom1s),
-  setof(X-Y-ToFrom2, terms_intersection(terms_to(variable(X)), terms_from(variable(Y)), ToFrom2), ToFrom1s).
+  setof(X-Y-ToFrom2, terms_intersection_to_from(terms_to(variable(X)), terms_from(variable(Y)), ToFrom2), ToFrom1s).
 
 test('terms_dom_intersection_termsto_termsto') :-
   setof(X-Y-ToTo1, terms_dom_intersection(terms_to(variable(X)), terms_to(variable(Y)), ToTo1), ToTo1s),
-  setof(X-Y-ToTo2, terms_intersection(terms_to(variable(X)), terms_to(variable(Y)), ToTo2), ToTo1s).
+  setof(X-Y-ToTo2, terms_intersection_to_to(terms_to(variable(X)), terms_to(variable(Y)), ToTo2), ToTo1s).
 
 test('terms_dom_intersection_termsto_int') :-
   setof(X-Y-Z-ToInt1, terms_dom_intersection(terms_to(variable(X)), [variable(Y),variable(Z)], ToInt1), ToInt1s),
-  setof(X-Y-Z-ToInt2, terms_intersection(terms_to(variable(X)), [variable(Y),variable(Z)], ToInt2), ToInt1s).
+  setof(X-Y-Z-ToInt2, terms_intersection_to_int(terms_to(variable(X)), [variable(Y),variable(Z)], ToInt2), ToInt1s).
 
 test('terms_dom_intersection_int_allterms') :-
   terms_dom_intersection([variable(X),variable(Y)], all_terms, [variable(X),variable(Y)]).
@@ -1011,15 +1011,15 @@ test('terms_dom_intersection_int_singleton_[v,v]_v') :-
 
 test('terms_dom_intersection_int_termsfrom') :-
   setof(X-Y-Z-IntFrom1, terms_dom_intersection([variable(X),variable(Y)], terms_from(variable(Z)), IntFrom1), IntFrom1s),
-  setof(X-Y-Z-IntFrom2, terms_intersection(terms_from(variable(Z)), [variable(X),variable(Y)], IntFrom2), IntFrom1s).
+  setof(X-Y-Z-IntFrom2, terms_intersection_from_int(terms_from(variable(Z)), [variable(X),variable(Y)], IntFrom2), IntFrom1s).
 
 test('terms_dom_intersection_int_termsto') :-
   setof(X-Y-Z-IntTo1, terms_dom_intersection([variable(X),variable(Y)], terms_to(variable(Z)), IntTo1), IntTo1s),
-  setof(X-Y-Z-IntTo2, terms_intersection(terms_to(variable(Z)), [variable(X),variable(Y)], IntTo2), IntTo1s).
+  setof(X-Y-Z-IntTo2, terms_intersection_to_int(terms_to(variable(Z)), [variable(X),variable(Y)], IntTo2), IntTo1s).
 
 test('terms_dom_intersection_int_int') :-
   setof(X-Y-Z-W-IntInt1, terms_dom_intersection([variable(X),variable(Y)], [variable(Z),variable(W)], IntInt1), IntInt1s),
-  setof(X-Y-Z-W-IntInt2, terms_intersection([variable(X),variable(Y)], [variable(Z),variable(W)], IntInt2), IntInt1s).
+  setof(X-Y-Z-W-IntInt2, terms_intersection_int_int([variable(X),variable(Y)], [variable(Z),variable(W)], IntInt2), IntInt1s).
 
 test('terms_dom_intersection_singleton_allterms') :-
   terms_dom_intersection(singleton(variable(X)), all_terms, singleton(variable(X))).
@@ -1306,7 +1306,7 @@ test('unify_allterms_int_v_v', [ fail ]) :-
   is_term(X),
   term_at_least(Y, L), term_at_most(Y, U), dif(L, U),
   X = Y,
-  \+ get_attr(X, term_order, [variable(L), variable(U)]). 
+  \+ get_attr(X, term_order, [variable(L), variable(U)]).
 
 test('unify_termsfrom_allterms', [ fail ]) :-
   term_at_least(X, 1),
@@ -1351,7 +1351,7 @@ test('unify_termsfrom_termsto_c_c', [ fail ]) :-
   term_at_least(X, 1),
   term_at_most(Y, 2),
   X = Y,
-  \+ get_attr(Y, term_order, [const(1), const(2)]). 
+  \+ get_attr(Y, term_order, [const(1), const(2)]).
 
 test('unify_termsfrom_termsto_c_v', [ fail ]) :-
   term_at_least(X, 1),
@@ -1378,7 +1378,7 @@ test('unify_termsfrom_termsto_v_c', [ fail ]) :-
   term_at_most(Y, 2),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), 
+  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected),
         \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -1397,7 +1397,7 @@ test('unify_termsfrom_termsto_v_v', [ fail ]) :-
   term_at_most(Y, _),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), 
+  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected),
         \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -1471,7 +1471,7 @@ test('unify_termsfrom_int_v_[c,c]', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected), 
+  setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected),
         \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
   \+ Expecteds = Actuals.
@@ -1481,7 +1481,7 @@ test('unify_termsfrom_int_v_[c,c]_singleton', [ fail ]) :-
   term_at_least(Y, 1), term_at_most(Y, 3),
   get_attr(X, term_order, Dom1),
   get_attr(Y, term_order, Dom2),
-  terms_intersection(Dom1, Dom2, singleton(S)), 
+  terms_intersection(Dom1, Dom2, singleton(S)),
   X = Y, \+ get_attr(Y, term_order, _), arg(1, S, V),
   \+ Y == V.
 
@@ -1529,7 +1529,7 @@ test('unify_termsfrom_int_v_[v,v]', [ fail ]) :-
   setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected),
                    \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
-  \+ Expecteds = Actuals. 
+  \+ Expecteds = Actuals.
 
 test('unify_termsfrom_int_v_[v,v]_singleton', [ fail ]) :-
   term_at_least(X, _),
@@ -1863,7 +1863,7 @@ test('unify_int_termsfrom_[c,v]_v', [ fail ]) :-
   setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected),
                    \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
-  \+ Expecteds = Actuals. 
+  \+ Expecteds = Actuals.
 
 test('unify_int_termsfrom_[c,v]_v_singleton', [ fail ]) :-
   term_at_least(X, 1), term_at_most(X, _),
@@ -1927,7 +1927,7 @@ test('unify_int_termsfrom_[v,v]_v', [ fail ]) :-
   setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected),
                        \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
-  \+ Expecteds = Actuals. 
+  \+ Expecteds = Actuals.
 
 test('unify_int_termsfrom_[v,v]_v_singleton', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, _),
@@ -1945,7 +1945,7 @@ test('unify_int_termsto_[c,c]_c', [ fail ]) :-
   get_attr(Y, term_order, Dom2),
   setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
-  \+ Expecteds = Actuals. 
+  \+ Expecteds = Actuals.
 
 test('unify_int_termsto_[c,c]_v', [ fail ]) :-
   term_at_least(X, 1), term_at_most(X, 3),
@@ -2018,7 +2018,7 @@ test('unify_int_termsto_[v,c]_v', [ fail ]) :-
   setof(X-Y-Expected, (terms_intersection(Dom1, Dom2, Expected),
                    \+ Expected == empty, \+ Expected = singleton(_)), Expecteds),
   setof(X-Y-Actual, (X = Y, get_attr(Y, term_order, Actual)), Actuals),
-  \+ Expecteds = Actuals. 
+  \+ Expecteds = Actuals.
 
 test('unify_int_termsto_[v,c]_v_singleton', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, 3),
@@ -2203,7 +2203,7 @@ test('unify_free_attr_sets_domain', [ fail ]) :-
   \+ Actuals = [X-Y-[const(2), const(4)]].
 
 test('unify_allterms_unifies_with_any') :-
-  is_term(X), 
+  is_term(X),
   X = a.
 
 test('unify_termsfrom_const_unifies_indomain') :-
@@ -2236,34 +2236,34 @@ test('unify_termsto_var_unifies_indomain') :-
 
 test('unify_int_[c,c]_unifies_indomain') :-
   term_at_least(X, 2), term_at_most(X, 4),
-  X = 3. 
+  X = 3.
 
 test('unify_int_[c,c]_unifies_outdomain', [ fail ]) :-
   term_at_least(X, 2), term_at_most(X, 4),
-  X = 1. 
+  X = 1.
 
-test('unify_int_[c,v]_unifies_indomain') :-
+test('unify_int_[c,v]_unifies_indomain', [ fail ]) :-
   term_at_least(X, 2), term_at_most(X, Z),
-  X = 3, 
-  term_at_least(Z, 3). 
+  X = 3,
+  \+ term_at_least(Z, 3).
 
 test('unify_int_[c,v]_unifies_outdomain', [ fail ]) :-
   term_at_least(X, 2), term_at_most(X, _),
   X = 1.
 
-test('unify_int_[v,c]_unifies_indomain') :-
+test('unify_int_[v,c]_unifies_indomain', [ fail ]) :-
   term_at_least(X, Z), term_at_most(X, 4),
-  X = 3, 
-  term_at_most(Z, 3). 
+  X = 3,
+  \+ term_at_most(Z, 3).
 
 test('unify_int_[v,c]_unifies_outdomain', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, 4),
   X = 5.
 
-test('unify_int_[v,v]_unifies_indomain') :-
+test('unify_int_[v,v]_unifies_indomain', [ fail ]) :-
   term_at_least(X, Z1), term_at_most(X, Z2),
-  X = 3, 
-  term_at_most(Z1, 3), term_at_least(Z2, 3).
+  X = 3,
+  \+ term_at_most(Z1, 3), term_at_least(Z2, 3).
 
 
 :- end_tests(clp_term).

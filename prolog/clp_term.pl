@@ -3,15 +3,21 @@
     is_term/1,
     term_at_least/2,
     term_at_most/2,
-    terms_intersection/3,
+    terms_intersection_from_from/3,
+    terms_intersection_to_to/3,
+    terms_intersection_from_to/3,
+    terms_intersection_to_from/3,
+    terms_intersection_from_int/3,
+    terms_intersection_int_from/3,
+    terms_intersection_to_int/3,
+    terms_intersection_int_to/3,
+    terms_intersection_int_int/3,
     term_normalized/2,
     dom_normalized/2,
     terms_dom_intersection/3,
     attr_unify_hook/2,
     attribute_goals/3
   ]).
-
-:- discontiguous clp_term:terms_intersection/3.
 
 % term_indomain(-Term, +Dom) is det.
 % term_indomain(-Term, -Dom) is det.
@@ -114,7 +120,7 @@ dom_normalized(Dom0, Dom) :-
 %
 % Intersection of two lower-bounded domains. Input domains must be normalized first to yield
 % correct answers: see `dom_normalized/2`.
-terms_intersection(terms_from(X), terms_from(Y), Intersection) :-
+terms_intersection_from_from(terms_from(X), terms_from(Y), Intersection) :-
   (  [X, Y] = [const(X1), const(Y1)] 
   -> (  X1 @>= Y1
      -> Intersection = terms_from(const(X1))
@@ -127,7 +133,7 @@ terms_intersection(terms_from(X), terms_from(Y), Intersection) :-
 %
 % Intersection of two upper-bounded domains. Input domains must be normalized first to yield
 % correct answers: see `dom_normalized/2`.
-terms_intersection(terms_to(X), terms_to(Y), Intersection) :-
+terms_intersection_to_to(terms_to(X), terms_to(Y), Intersection) :-
   (  [X, Y] = [const(X1), const(Y1)] 
   -> (  X1 @=< Y1
      -> Intersection = terms_to(const(X1))
@@ -140,7 +146,7 @@ terms_intersection(terms_to(X), terms_to(Y), Intersection) :-
 %
 % Intersection of a lower-bounded domain with an upper-bounded domain. Input domains must be 
 % normalized first to yield correct answers: see `dom_normalized/2`.
-terms_intersection(terms_from(X), terms_to(Y), Intersection) :-
+terms_intersection_from_to(terms_from(X), terms_to(Y), Intersection) :-
   (  [X, Y] = [const(X1), const(Y1)]
   -> (  X1 == Y1
      -> Intersection = singleton(X)
@@ -161,8 +167,8 @@ terms_intersection(terms_from(X), terms_to(Y), Intersection) :-
 %
 % Intersection of an upper-bounded domain with a lower-bounded domain. Input domains must be 
 % normalized first to yield correct answers: see `dom_normalized/2`.
-terms_intersection(terms_to(X), terms_from(Y), Intersection) :-
-  terms_intersection(terms_from(Y), terms_to(X), Intersection).
+terms_intersection_to_from(terms_to(X), terms_from(Y), Intersection) :-
+  terms_intersection_from_to(terms_from(Y), terms_to(X), Intersection).
 
 % Helper predicate for comparing endpoints
 term_order(X, Y, Ord) :-
@@ -199,7 +205,7 @@ terms_from_int_lookup(>>, _, _, _, [empty]).
 %
 % Intersection of a lower-bounded domain with a closed interval. Input domains must be 
 % normalized first to yield correct answers: see `dom_normalized/2`.
-terms_intersection(terms_from(X), [Y, Z], Intersection) :-
+terms_intersection_from_int(terms_from(X), [Y, Z], Intersection) :-
   terms_orderKey(X, Y, Z, OrderKey),
   terms_from_int_lookup(OrderKey, X, Y, Z, Intersections),
   member(Intersection0, Intersections),
@@ -212,8 +218,8 @@ terms_intersection(terms_from(X), [Y, Z], Intersection) :-
 %
 % Intersection of a closed interval with a lower-bounded domain. Input domains must be 
 % normalized first to yield correct answers: see `dom_normalized/2`.
-terms_intersection([X, Y], terms_from(Z), Intersection) :-
-  terms_intersection(terms_from(Z), [X, Y], Intersection).
+terms_intersection_int_from([X, Y], terms_from(Z), Intersection) :-
+  terms_intersection_from_int(terms_from(Z), [X, Y], Intersection).
 
 % Lookup table for intersecting half-interval with closed interval 
 terms_to_int_lookup(??, X, Y, Z, [[Y,Z], [Y,X], singleton(Y), empty]).
@@ -233,7 +239,7 @@ terms_to_int_lookup(>>, _, Y, Z, [[Y,Z]]).
 %
 % Intersection of an upper-bounded domain with a closed interval. Input domains must be 
 % normalized first to yield correct answers: see `dom_normalized/2`.
-terms_intersection(terms_to(X), [Y, Z], Intersection) :-
+terms_intersection_to_int(terms_to(X), [Y, Z], Intersection) :-
   terms_orderKey(X, Y, Z, OrderKey),
   terms_to_int_lookup(OrderKey, X, Y, Z, Intersections),
   member(Intersection0, Intersections),
@@ -246,8 +252,8 @@ terms_intersection(terms_to(X), [Y, Z], Intersection) :-
 %
 % Intersection of an upper-bounded domain with a closed interval. Input domains must be 
 % normalized first to yield correct answers: see `dom_normalized/2`.
-terms_intersection([X, Y], terms_to(Z), Intersection) :-
-  terms_intersection(terms_to(Z), [X, Y], Intersection).
+terms_intersection_int_to([X, Y], terms_to(Z), Intersection) :-
+  terms_intersection_to_int(terms_to(Z), [X, Y], Intersection).
 
 % Helper predicate for building keys for lookup 
 terms_orderKey(X, Y, Z, W, XrW, YrZ, OrderKey) :-
@@ -291,7 +297,7 @@ terms_int_int_lookup(????, X, Y, Z, W, [[Z,W], [X,W], [Z,Y], [X,Y], singleton(X)
 %
 % Intersection of two closed intervals.  Input domains must be normalized first to yield correct 
 % answers: see `dom_normalized/2`.
-terms_intersection([X, Y], [Z, W], Intersection) :-
+terms_intersection_int_int([X, Y], [Z, W], Intersection) :-
   (  Y == Z
   -> Intersection = singleton(Y)
   ;  X == W
@@ -369,7 +375,30 @@ terms_dom_intersection(Dom1, Dom2, Intersection) :-
      )
   ;  NewDom1 = singleton(_), member(NewDom2, [terms_from(_), terms_to(_), [_,_]])
   -> terms_dom_intersection(Dom2, Dom1, Intersection)
-  % TODO: We should split this into separate functions to remove unnecessary choicepoints:
+  ;  NewDom1 = terms_from(_)
+  -> (  NewDom2 = terms_from(_)
+     -> terms_intersection_from_from(NewDom1, NewDom2, Intersection)
+     ;  NewDom2 = terms_to(_)
+     -> terms_intersection_from_to(NewDom1, NewDom2, Intersection)
+     ;  NewDom2 = [_,_]
+     -> terms_intersection_from_int(NewDom1, NewDom2, Intersection)
+     )
+  ;  NewDom1 = terms_to(_)
+  -> (  NewDom2 = terms_from(_)
+     -> terms_intersection_to_from(NewDom1, NewDom2, Intersection)
+     ;  NewDom2 = terms_to(_)
+     -> terms_intersection_to_to(NewDom1, NewDom2, Intersection)
+     ;  NewDom2 = [_,_]
+     -> terms_intersection_to_int(NewDom1, NewDom2, Intersection)
+     )
+  ;  NewDom1 = [_,_]
+  -> (  NewDom2 = terms_from(_)
+     -> terms_intersection_int_from(NewDom1, NewDom2, Intersection)
+     ;  NewDom2 = terms_to(_)
+     -> terms_intersection_int_to(NewDom1, NewDom2, Intersection)
+     ;  NewDom2 = [_,_]
+     -> terms_intersection_int_int(NewDom1, NewDom2, Intersection)
+     )
   ;  terms_intersection(NewDom1, NewDom2, Intersection)
   ).
   
@@ -421,5 +450,13 @@ attr_unify_hook(Dom1, Term2) :-
 attribute_goals(Term) -->
   { get_attr(Term, term_order, Dom0) },
   { dom_normalized(Dom0, Dom1) },
-  [term_in(Term, Dom1)].
+  { (  Dom1 = terms_from(X), arg(1, X, X0)
+    -> Out  = [term_at_least(Term, X0)]
+    ;  Dom1 = terms_to(Y), arg(1, Y, Y0)
+    -> Out  = [term_at_most(Term, Y0)]
+    ;  Dom1 = [X, Y], arg(1, X, X0), arg(1, Y, Y0)
+    -> Out  = [term_at_least(X0), term_at_most(Y0)] 
+    )
+  },
+  Out.
 
