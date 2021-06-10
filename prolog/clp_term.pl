@@ -399,7 +399,6 @@ terms_dom_intersection(Dom1, Dom2, Intersection) :-
      ;  NewDom2 = [_,_]
      -> terms_intersection_int_int(NewDom1, NewDom2, Intersection)
      )
-  ;  terms_intersection(NewDom1, NewDom2, Intersection)
   ).
   
 % Hook for term unification in the new "term_order" domain 
