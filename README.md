@@ -1,17 +1,24 @@
 # Description
-**clp(Term): Constraint Logic Programming for Terms in their Standard Ordering**
+**clp(Term): Constraint Logic Programming for the Standard Ordering of Terms**
 
-This module introduces an interval theory for arbitary terms in their standard total ordering.
-It is intended for use with SWI Prolog; please see LICENSE for terms of use.
+This module exposes the standard ordering on Prolog terms as an interval theory, thereby providing fully declarative
+replacements for the predicates `@</2`, `@=</2`, `@>/2`, `@>=/2`. It is intended for use with SWI Prolog; please see
+LICENSE for terms of use.
 
-# Installation
+# Installation and Usage
 To install this module via `pack_install`, run
 ```
-pack_install('https://github.com/mmisamore/clp_term/archive/0.1.0.zip').
+pack_install('https://github.com/mmisamore/clp_term/archive/1.0.0.zip').
+```
+To use this module in your project:
+```
+:- use_module(library(clp_term)).
 ```
 
 # Example Usage
-TODO: Provide some examples here 
+
+
+
 
 # Theory 
 The theory consists of the following interval types:
