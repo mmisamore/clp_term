@@ -16,6 +16,7 @@
     dom_normalized/2,
     terms_dom_intersection/3,
     attr_unify_hook/2,
+    attribute_termorder_goals/3,
     attribute_goals/3
   ]).
 
@@ -26,7 +27,7 @@
 % constrained in the standard ordering of terms it is unified with this new constraint.
 term_indomain(Term, Dom) :-
   (  nonvar(Term) % don't support Term enumeration 
-  -> fail
+  -> fail         % TODO: turn this into an uninstantiation error 
   ;  var(Dom)
   -> get_attr(Term, term_order, Dom)
   ;  (  get_attr(Term, term_order, Dom1) % already attributed?
@@ -76,7 +77,7 @@ term_at_most(Term, Y) :-
 % behavior when variable endpoints are grounded. 
 term_normalized(Term0, Term) :-
   (  var(Term0)
-  -> fail
+  -> fail % turn this into an instantiation error
   ;  Term0 = variable(X)
   -> (  nonvar(X)
      -> Term = const(X)
@@ -446,16 +447,21 @@ attr_unify_hook(Dom1, Term2) :-
      )
   ).
 
+% attribute_termorder_goals(+Term, +Dom, -ResidualGoals) is det.
+% List of `ResidualGoals` for `Term` subject to outstanding constraints from `Dom`
+attribute_termorder_goals(Term, Dom, ResidualGoals) :-
+  (  Dom = terms_from(X), arg(1, X, X0)
+  -> ResidualGoals = [term_at_least(Term, X0)]
+  ;  Dom = terms_to(Y), arg(1, Y, Y0)
+  -> ResidualGoals = [term_at_most(Term, Y0)]
+  ;  Dom = [X, Y], arg(1, X, X0), arg(1, Y, Y0)
+  -> ResidualGoals = [term_at_least(Term, X0), term_at_most(Term, Y0)]
+  ).
+
 attribute_goals(Term) -->
-  { get_attr(Term, term_order, Dom0) },
-  { dom_normalized(Dom0, Dom1) },
-  { (  Dom1 = terms_from(X), arg(1, X, X0)
-    -> Out  = [term_at_least(Term, X0)]
-    ;  Dom1 = terms_to(Y), arg(1, Y, Y0)
-    -> Out  = [term_at_most(Term, Y0)]
-    ;  Dom1 = [X, Y], arg(1, X, X0), arg(1, Y, Y0)
-    -> Out  = [term_at_least(X0), term_at_most(Y0)] 
-    )
+  { get_attr(Term, term_order, Dom0),
+    dom_normalized(Dom0, Dom1),
+    attribute_termorder_goals(Term, Dom1, ResidualGoals) 
   },
-  Out.
+  ResidualGoals.
 

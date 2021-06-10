@@ -3,7 +3,7 @@
 :- begin_tests(clp_term).
 
 
-% Tests for term_indomain
+% Tests for term_indomain/2
 test('term_indomain_+_+_fails', [ fail ]) :-
   term_indomain(1, all_terms).
 
@@ -30,7 +30,7 @@ test('term_indomain_-_-_put_get') :-
   Dom == all_terms.
 
 
-% Tests for is_term
+% Tests for is_term/1
 test('is_term_-_get') :-
   is_term(Term),
   get_attr(Term, term_order, all_terms).
@@ -41,7 +41,7 @@ test('is_term_-_already_constrained') :-
   get_attr(Term, term_order, terms_from(const(42))).
 
 
-% Tests for term_at_least
+% Tests for term_at_least/2
 test('term_at_least_-_+') :-
   term_at_least(Term, x),
   get_attr(Term, term_order, terms_from(const(x))).
@@ -55,7 +55,7 @@ test('term_at_least_-_+_already_constrained', [ fail ]) :-
   term_at_least(Term, y),
   \+ get_attr(Term, term_order, terms_from(const(y))).
 
-% Tests for term_at_most
+% Tests for term_at_most/2
 test('term_at_most_-_+') :-
   term_at_most(Term, y),
   get_attr(Term, term_order, terms_to(const(y))).
@@ -69,7 +69,7 @@ test('term_at_most_-_+_already_constrained', [ fail ]) :-
   term_at_most(Term, x),
   \+ get_attr(Term, term_order, terms_to(const(x))).
 
-% Tests for term_normalized
+% Tests for term_normalized/2
 test('term_normalized_c_c') :-
   term_normalized(const(a), const(a)).
 
@@ -123,7 +123,7 @@ test('term_normalized_naked_const_+_-', [ fail ]) :-
   term_normalized(a, _).
 
 
-% Tests for dom_normalized
+% Tests for dom_normalized/2
 test('dom_normalized_empty_empty_+_+') :-
   dom_normalized(empty, empty).
 
@@ -436,7 +436,7 @@ test('dom_normalized_+_-_uninstantiated_endpoint', [ fail ]) :-
   Y = terms_from(const(a)).
 
 
-% Tests for terms_intersection (from-from case)
+% Tests for terms_intersection_from_from/3
 test('terms_from_from_intersection_c_c_>=') :-
   setof(I, terms_intersection_from_from(terms_from(const(y)), terms_from(const(x)), I), [terms_from(const(y))]).
 
@@ -456,7 +456,7 @@ test('terms_from_from_intersection_v_v') :-
   Ans = [X-Y-terms_from(variable(X)), X-Y-terms_from(variable(Y))].
 
 
-% Tests for terms_intersection (to-to case)
+% Tests for terms_intersection_to_to/3
 test('terms_to_to_intersection_c_c_>=') :-
   setof(I, terms_intersection_to_to(terms_to(const(y)), terms_to(const(x)), I), [terms_to(const(x))]).
 
@@ -476,7 +476,7 @@ test('terms_to_to_intersection_v_v') :-
   Ans = [X-Y-terms_to(variable(X)), X-Y-terms_to(variable(Y))].
 
 
-% Tests for terms_intersection (from-to case)
+% Tests for terms_intersection_from_to/3
 test('terms_from_to_intersection_c_c_=') :-
   setof(I, terms_intersection_from_to(terms_from(const(x)), terms_to(const(x)), I), [singleton(const(x))]).
 
@@ -515,13 +515,13 @@ test('terms_from_to_intersection_v_v_not_interval_if_identical', [ fail ]) :-
   terms_intersection_from_to(terms_from(variable(X)), terms_to(variable(Y)), [variable(X), variable(Y)]).
 
 
-% Tests for terms_intersection (to-from case)
+% Tests for terms_intersection_to_from/3
 test('terms_to_from_intersection_agrees_with_from_to') :-
   setof(X-Y-ToFrom, terms_intersection_to_from(terms_to(variable(X)), terms_from(variable(Y)), ToFrom), ToFroms),
   setof(X-Y-FromTo, terms_intersection_from_to(terms_from(variable(Y)), terms_to(variable(X)), FromTo), ToFroms).
 
 
-% Tests for terms_intersection (from-int case)
+% Tests for terms_intersection_from_int/3
 % | x R y | x R z | Out                      |
 % |   ?   |   ?   |  [y, z]; [x, z]; [z]; [] |
 % |   ?   |   <   |  [y, z]; [x, z]          |
@@ -579,7 +579,7 @@ test('terms_from_int_intersection_>_>') :-
   terms_intersection_from_int(terms_from(const(c)), [const(a), const(b)], empty).
 
 
-% Tests for terms_intersection (int-from case)
+% Tests for terms_intersection_int_from/3
 test('terms_int_from_intersection_agrees_with_from_int', [ fail ]) :-
   member(X, [const(1), variable(_)]),
   member(Y, [const(3), variable(_)]),
@@ -588,7 +588,7 @@ test('terms_int_from_intersection_agrees_with_from_int', [ fail ]) :-
   \+ setof(X-Y-Z-FromInt, terms_intersection_from_int(terms_from(Z), [X, Y], FromInt), IntFroms).
 
 
-% Tests for terms_intersection (to-int case)
+% Tests for terms_intersection_to_int/3
 % | x R y | x R z | Out                   |
 % |   ?   |   ?   | [y,z]; [y,x]; [y]; [] |
 % |   ?   |   <   | [y,x]; [y]; []        |
@@ -650,7 +650,7 @@ test('terms_to_int_intersection_>_>') :-
   terms_intersection_to_int(terms_to(const(c)), [const(a), const(b)], [const(a), const(b)]).
 
 
-% Tests for terms_intersection (int-to case)
+% Tests for terms_intersection_int_to/3
 test('terms_int_to_intersection_agrees_with_to_int', [ fail ]) :-
   member(X, [const(1), variable(_)]),
   member(Y, [const(3), variable(_)]),
@@ -659,7 +659,7 @@ test('terms_int_to_intersection_agrees_with_to_int', [ fail ]) :-
   \+ setof(X-Y-Z-ToInt, terms_intersection_to_int(terms_to(Z), [X, Y], ToInt), IntTos).
 
 
-% Tests for terms_intersection (int-int case)
+% Tests for terms_intersection_int_int/3
 % | xRz | xRw | yRz | yRw | Out                        | Analysis
 % |     |     |  <  |     | empty                      | [xy][zw]
 % |     |  >  |     |     | empty                      | [zw][xy]
@@ -899,7 +899,7 @@ test('terms_int_int_intersection_x==w_shortcuts_to_singleton') :-
   Ans = [X-W-singleton(variable(X))].
 
 
-% Tests for terms_dom_intersection
+% Tests for terms_dom_intersection/3
 test('terms_dom_intersection_allterms_allterms') :-
   terms_dom_intersection(all_terms, all_terms, all_terms).
 
@@ -2267,6 +2267,40 @@ test('unify_int_[v,v]_unifies_indomain', [ fail ]) :-
   term_at_least(X, Z1), term_at_most(X, Z2),
   X = 3,
   \+ term_at_most(Z1, 3), term_at_least(Z2, 3).
+
+
+% Tests for attribute_termorder_goals/3
+test('attribute_termorder_goals_from_c') :-
+  attribute_termorder_goals(Term, terms_from(const(1)), ResidualGoals),
+  ResidualGoals == [term_at_least(Term, 1)].
+
+test('attribute_termorder_goals_from_v') :-
+  attribute_termorder_goals(Term, terms_from(variable(X)), ResidualGoals),
+  ResidualGoals == [term_at_least(Term, X)].
+
+test('attribute_termorder_goals_to_c') :-
+  attribute_termorder_goals(Term, terms_to(const(2)), ResidualGoals),
+  ResidualGoals == [term_at_most(Term, 2)].
+
+test('attribute_termorder_goals_to_v') :-
+  attribute_termorder_goals(Term, terms_to(variable(Y)), ResidualGoals),
+  ResidualGoals == [term_at_most(Term, Y)].
+
+test('attribute_termorder_goals_int_c_c') :-
+  attribute_termorder_goals(Term, [const(1), const(2)], ResidualGoals),
+  ResidualGoals == [term_at_least(Term, 1), term_at_most(Term, 2)].
+
+test('attribute_termorder_goals_int_c_v') :-
+  attribute_termorder_goals(Term, [const(1), variable(Y)], ResidualGoals),
+  ResidualGoals == [term_at_least(Term, 1), term_at_most(Term, Y)].
+
+test('attribute_termorder_goals_int_v_c') :-
+  attribute_termorder_goals(Term, [variable(X), const(2)], ResidualGoals),
+  ResidualGoals == [term_at_least(Term, X), term_at_most(Term, 2)].
+
+test('attribute_termorder_goals_int_v_v') :-
+  attribute_termorder_goals(Term, [variable(X), variable(Y)], ResidualGoals),
+  ResidualGoals == [term_at_least(Term, X), term_at_most(Term, Y)].
 
 
 :- end_tests(clp_term).
