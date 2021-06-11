@@ -1,6 +1,10 @@
 :- module(clp_term,
   [ term_at_least/2,
     term_at_most/2,
+    is_term/1,
+    is_empty_term/1,
+    is_singleton_term/1,
+    term_indomain/2,
     terms_dom_intersection/3
   ]).
 
@@ -27,6 +31,19 @@ term_indomain(Term, Dom) :-
 % the standard ordering of terms this new constraint has no effect.
 is_term(Term) :-
   term_indomain(Term, all_terms).
+
+% is_empty_term(-Term) is det.
+% 
+% True whenever `Term` cannot be bound to any value in the standard ordering of terms.
+is_empty_term(Term) :-
+  term_indomain(Term, empty). 
+
+% is_singleton_term(-Term, +X) is det.
+% is_singleton_term(-Term, -X) is det.
+%
+% True whenever `Term` can only be bound to a single possible value in the standard ordering of terms.
+is_singleton_term(Term, X) :-
+  fail. 
 
 % term_at_least(-Term, +X) is det.
 % term_at_least(-Term, -X) is det.
@@ -327,10 +344,12 @@ terms_intersection_int_int([X, Y], [Z, W], Intersection) :-
 terms_dom_intersection(Dom1, Dom2, Intersection) :-
   dom_normalized(Dom1, NewDom1),
   dom_normalized(Dom2, NewDom2),
-  (  NewDom1 = all_terms
+  (  NewDom1 == all_terms
   -> Intersection = NewDom2
-  ;  NewDom2 = all_terms
+  ;  NewDom2 == all_terms
   -> Intersection = NewDom1
+  ;  (NewDom1 == empty ; NewDom2 == empty)
+  -> Intersection = empty
   ;  NewDom2 = singleton(Y) % handle case when second domain is singleton
   -> (  NewDom1 = terms_from(X)
      -> (  X = const(X1), Y = const(Y1), X1 @=< Y1 
@@ -388,7 +407,7 @@ terms_dom_intersection(Dom1, Dom2, Intersection) :-
   
 % Hook for term unification in the new "clp_term" domain 
 attr_unify_hook(Dom1, Term2) :-
-  (  get_attr(Term2, clp_term, Dom2)      % Term2 is already attributed
+  (  get_attr(Term2, clp_term, Dom2)        % Term2 is already attributed
   -> terms_dom_intersection(Dom1, Dom2, NewDom),
      (  NewDom == empty                     % Fail to unify if resulting domain is empty
      -> fail
@@ -440,6 +459,12 @@ attribute_termorder_goals(Term, Dom, ResidualGoals) :-
   -> ResidualGoals = [term_at_most(Term, Y0)]
   ;  Dom = [X, Y], arg(1, X, X0), arg(1, Y, Y0)
   -> ResidualGoals = [term_at_least(Term, X0), term_at_most(Term, Y0)]
+  ;  Dom = singleton(X), arg(1, X, X0)
+  -> ResidualGoals = [is_singleton_term(Term, X0)]
+  ;  Dom == empty
+  -> ResidualGoals = [is_empty_term(Term)]
+  ;  Dom == all_terms
+  -> ResidualGoals = [is_term(Term)]
   ).
 
 attribute_goals(Term) -->

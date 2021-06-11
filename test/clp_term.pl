@@ -4,40 +4,78 @@
 
 % Tests for term_indomain/2
 test('term_indomain_+_+_fails', [ throws(error(uninstantiation_error(1), _)) ]) :-
-  clp_term:term_indomain(1, all_terms).
+  term_indomain(1, all_terms).
 
 test('term_indomain_+_-_fails', [ throws(error(uninstantiation_error(1), _)) ]) :-
-  clp_term:term_indomain(1, _).
+  term_indomain(1, _).
 
 test('term_indomain_-_+_succeeds') :-
-  clp_term:term_indomain(Term, all_terms),
+  term_indomain(Term, all_terms),
   get_attr(Term, clp_term, all_terms).
 
 test('term_indomain_-_+_put_twice_unifies', [ fail ]) :-
-  clp_term:term_indomain(Term, terms_from(const(1))),
-  clp_term:term_indomain(Term, terms_to(const(2))),
+  term_indomain(Term, terms_from(const(1))),
+  term_indomain(Term, terms_to(const(2))),
   \+ get_attr(Term, clp_term, [const(1), const(2)]).
 
 test('term_indomain_-_-_succeeds') :-
   put_attr(Term, clp_term, all_terms),
-  clp_term:term_indomain(Term, Dom),
+  term_indomain(Term, Dom),
   Dom == all_terms.
 
 test('term_indomain_-_-_put_get') :-
-  clp_term:term_indomain(Term, all_terms),
-  clp_term:term_indomain(Term, Dom),
+  term_indomain(Term, all_terms),
+  term_indomain(Term, Dom),
   Dom == all_terms.
 
 
 % Tests for is_term/1
 test('is_term_-_get') :-
-  clp_term:is_term(Term),
+  is_term(Term),
   get_attr(Term, clp_term, all_terms).
 
 test('is_term_-_already_constrained') :-
-  clp_term:term_indomain(Term, terms_from(const(42))),
-  clp_term:is_term(Term),
+  term_indomain(Term, terms_from(const(42))),
+  is_term(Term),
   get_attr(Term, clp_term, terms_from(const(42))).
+
+
+% Tests for is_empty_term/1
+test('is_empty_term_-_get') :-
+  is_empty_term(Term),
+  get_attr(Term, clp_term, empty).
+
+test('is_empty_term_-_already_constrained') :-
+  term_indomain(Term, terms_from(const(42))),
+  is_empty_term(Term),
+  get_attr(Term, clp_term, empty).
+
+
+% Tests for is_singleton_term/1
+test('is_singleton_term_-_+_c_get') :-
+  is_singleton_term(Term, 42),
+  get_attr(Term, clp_term, singleton(const(42))).
+
+test('is_singleton_term_-_+_v_get') :-
+  is_singleton_term(Term, X),
+  get_attr(Term, clp_term, singleton(variable(X))).
+
+test('is_singleton_term_-_+_already_constrained_c_c') :-
+  term_at_least(Term, 42),
+  is_singleton_term(Term, 43),
+  get_attr(Term, clp_term, singleton(const(43))).
+
+test('is_singleton_term_-_+_already_constrained_c_c_fails', [ fail ]) :-
+  term_at_least(Term, 43),
+  is_singleton_term(Term, 42).
+
+test('is_singleton_term_-_+_already_constrained_c_v') :-
+  term_at_least(Term, 42), 
+  is_singleton_term(Term, X),
+  get_attr(Term, clp_term, singleton(variable(X))),
+  get_attr(X, clp_term, terms_from(const(42))).
+
+% TODO: keep going with these tests 
 
 
 % Tests for term_at_least/2
@@ -54,6 +92,7 @@ test('term_at_least_-_+_already_constrained', [ fail ]) :-
   term_at_least(Term, y),
   \+ get_attr(Term, clp_term, terms_from(const(y))).
 
+
 % Tests for term_at_most/2
 test('term_at_most_-_+') :-
   term_at_most(Term, y),
@@ -67,6 +106,7 @@ test('term_at_most_-_+_already_constrained', [ fail ]) :-
   term_at_most(Term, y),
   term_at_most(Term, x),
   \+ get_attr(Term, clp_term, terms_to(const(x))).
+
 
 % Tests for term_normalized/2
 test('term_normalized_c_c') :-
@@ -1222,6 +1262,12 @@ test('terms_dom_intersection_1st_uninst_endpoint', [ throws(error(instantiation_
 test('terms_dom_intersection_2nd_uninst_endpoint', [ throws(error(instantiation_error(Y), _)) ]) :-
   terms_dom_intersection(terms_from(variable(_)), terms_from(Y), terms_from(variable(_))).
 
+test('terms_dom_intersection_first_empty') :-
+  terms_dom_intersection(empty, terms_from(variable(_)), empty).
+
+test('terms_dom_intersection_second_empty') :-
+  terms_dom_intersection(terms_from(variable(_)), empty, empty).
+
 
 % Tests for the unification hook
 test('unify_empty_intersection_fails_to_unify', [ fail ]) :-
@@ -1236,8 +1282,8 @@ test('unify_singleton_intersection_sets_exact_value_and_removes_attributes_c', [
   (X \== 2 ; Y \== 2 ; get_attr(X, clp_term, _) ; get_attr(Y, clp_term, _)).
 
 test('unify_singleton_intersection2_sets_exact_value_and_removes_attributes_c', [ fail ]) :-
-  clp_term:term_indomain(X, [const(1), const(2)]),
-  clp_term:term_indomain(Y, [const(2), const(3)]),
+  term_indomain(X, [const(1), const(2)]),
+  term_indomain(Y, [const(2), const(3)]),
   X = Y,
   (X \== 2 ; Y \== 2 ; get_attr(X, clp_term, _) ; get_attr(Y, clp_term, _)).
 
@@ -1248,68 +1294,68 @@ test('unify_singleton_intersection_sets_exact_value_and_removes_attributes_v', [
   (X \== Z ; Y \== Z ; get_attr(X, clp_term, _) ; get_attr(Y, clp_term, _)).
 
 test('unify_singleton_intersection2_sets_exact_value_and_removes_attributes_v', [ fail ]) :-
-  clp_term:term_indomain(X, [const(1), variable(Z)]),
-  clp_term:term_indomain(Y, [variable(Z), const(3)]),
+  term_indomain(X, [const(1), variable(Z)]),
+  term_indomain(Y, [variable(Z), const(3)]),
   X = Y,
   (X \== Z ; Y \== Z ; get_attr(X, clp_term, _) ; get_attr(Y, clp_term, _)).
 
 test('unify_allterms_allterms', [ fail ]) :-
-  clp_term:is_term(X),
-  clp_term:is_term(Y),
+  is_term(X),
+  is_term(Y),
   X = Y,
   \+ (get_attr(X, clp_term, all_terms), get_attr(Y, clp_term, all_terms)).
 
 test('unify_allterms_termsfrom_c', [ fail ]) :-
-  clp_term:is_term(X),
+  is_term(X),
   term_at_least(Y, 1),
   X = Y,
   \+ get_attr(X, clp_term, terms_from(const(1))).
 
 test('unify_allterms_termsfrom_v', [ fail ]) :-
-  clp_term:is_term(X),
+  is_term(X),
   term_at_least(Y, Z),
   X = Y,
   \+ get_attr(X, clp_term, terms_from(variable(Z))).
 
 test('unify_allterms_termsto_c', [ fail ]) :-
-  clp_term:is_term(X),
+  is_term(X),
   term_at_most(Y, 1),
   X = Y,
   \+ get_attr(X, clp_term, terms_to(const(1))).
 
 test('unify_allterms_termsto_v', [ fail ]) :-
-  clp_term:is_term(X),
+  is_term(X),
   term_at_most(Y, Z),
   X = Y,
   \+ get_attr(X, clp_term, terms_to(variable(Z))).
 
 test('unify_allterms_int_c_c', [ fail ]) :-
-  clp_term:is_term(X),
+  is_term(X),
   term_at_least(Y, 1), term_at_most(Y, 2),
   X = Y,
   \+ get_attr(X, clp_term, [const(1), const(2)]).
 
 test('unify_allterms_int_c_v', [ fail ]) :-
-  clp_term:is_term(X),
+  is_term(X),
   term_at_least(Y, 1), term_at_most(Y, U), dif(1, U),
   X = Y,
   \+ get_attr(X, clp_term, [const(1), variable(U)]).
 
 test('unify_allterms_int_v_c', [ fail ]) :-
-  clp_term:is_term(X),
+  is_term(X),
   term_at_least(Y, L), term_at_most(Y, 2), dif(L, 2),
   X = Y,
   \+ get_attr(X, clp_term, [variable(L), const(2)]).
 
 test('unify_allterms_int_v_v', [ fail ]) :-
-  clp_term:is_term(X),
+  is_term(X),
   term_at_least(Y, L), term_at_most(Y, U), dif(L, U),
   X = Y,
   \+ get_attr(X, clp_term, [variable(L), variable(U)]).
 
 test('unify_termsfrom_allterms', [ fail ]) :-
   term_at_least(X, 1),
-  clp_term:is_term(Y),
+  is_term(Y),
   X = Y,
   \+ get_attr(Y, clp_term, terms_from(const(1))).
 
@@ -1542,7 +1588,7 @@ test('unify_termsfrom_int_v_[v,v]_singleton', [ fail ]) :-
 
 test('unify_termsto_allterms', [ fail ]) :-
   term_at_most(X, 1),
-  clp_term:is_term(Y),
+  is_term(Y),
   X = Y,
   \+ get_attr(Y, clp_term, terms_to(const(1))).
 
@@ -1777,7 +1823,7 @@ test('unify_termsto_int_v_[v,v]_singleton', [ fail ]) :-
 
 test('unify_int_allterms_[c,c]', [ fail ]) :-
   term_at_least(X, 1), term_at_most(X, 3),
-  clp_term:is_term(Y),
+  is_term(Y),
   get_attr(X, clp_term, Dom1),
   get_attr(Y, clp_term, Dom2),
   setof(X-Y-Expected, (terms_dom_intersection(Dom1, Dom2, Expected)), Expecteds),
@@ -1786,7 +1832,7 @@ test('unify_int_allterms_[c,c]', [ fail ]) :-
 
 test('unify_int_allterms_[c,v]', [ fail ]) :-
   term_at_least(X, 1), term_at_most(X, _),
-  clp_term:is_term(Y),
+  is_term(Y),
   get_attr(X, clp_term, Dom1),
   get_attr(Y, clp_term, Dom2),
   setof(X-Y-Expected, (terms_dom_intersection(Dom1, Dom2, Expected)), Expecteds),
@@ -1795,7 +1841,7 @@ test('unify_int_allterms_[c,v]', [ fail ]) :-
 
 test('unify_int_allterms_[v,c]', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, 3),
-  clp_term:is_term(Y),
+  is_term(Y),
   get_attr(X, clp_term, Dom1),
   get_attr(Y, clp_term, Dom2),
   setof(X-Y-Expected, (terms_dom_intersection(Dom1, Dom2, Expected)), Expecteds),
@@ -1804,7 +1850,7 @@ test('unify_int_allterms_[v,c]', [ fail ]) :-
 
 test('unify_int_allterms_[v,v]', [ fail ]) :-
   term_at_least(X, _), term_at_most(X, _),
-  clp_term:is_term(Y),
+  is_term(Y),
   get_attr(X, clp_term, Dom1),
   get_attr(Y, clp_term, Dom2),
   setof(X-Y-Expected, (terms_dom_intersection(Dom1, Dom2, Expected)), Expecteds),
@@ -2205,7 +2251,7 @@ test('unify_free_attr_sets_domain', [ fail ]) :-
   \+ Actuals = [X-Y-[const(2), const(4)]].
 
 test('unify_allterms_unifies_with_any') :-
-  clp_term:is_term(X),
+  is_term(X),
   X = a.
 
 test('unify_termsfrom_const_unifies_indomain') :-
@@ -2300,6 +2346,22 @@ test('attribute_termorder_goals_int_v_c') :-
 test('attribute_termorder_goals_int_v_v') :-
   clp_term:attribute_termorder_goals(Term, [variable(X), variable(Y)], ResidualGoals),
   ResidualGoals == [term_at_least(Term, X), term_at_most(Term, Y)].
+
+test('attribute_termorder_goals_singleton_c') :-
+  clp_term:attribute_termorder_goals(Term, singleton(const(X)), ResidualGoals),
+  ResidualGoals == [is_singleton_term(Term, X)].
+
+test('attribute_termorder_goals_singleton_v') :-
+  clp_term:attribute_termorder_goals(Term, singleton(variable(X)), ResidualGoals),
+  ResidualGoals == [is_singleton_term(Term, X)].
+
+test('attribute_termorder_goals_empty') :-
+  clp_term:attribute_termorder_goals(Term, empty, ResidualGoals),
+  ResidualGoals == [is_empty_term(Term)].
+
+test('attribute_termorder_goals_allterms') :-
+  clp_term:attribute_termorder_goals(Term, all_terms, ResidualGoals),
+  ResidualGoals == [is_term(Term)].
 
 :- end_tests(clp_term).
 
