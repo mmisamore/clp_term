@@ -65,15 +65,31 @@ test('is_singleton_term_-_+_already_constrained_c_c') :-
   is_singleton_term(Term, 43),
   get_attr(Term, clp_term, singleton(const(43))).
 
-test('is_singleton_term_-_+_already_constrained_c_c_fails', [ fail ]) :-
+test('is_singleton_term_-_+_already_constrained_c_c_empty') :-
   term_at_least(Term, 43),
-  is_singleton_term(Term, 42).
+  is_singleton_term(Term, 42),
+  is_empty_term(Term).
 
 test('is_singleton_term_-_+_already_constrained_c_v') :-
   term_at_least(Term, 42), 
   is_singleton_term(Term, X),
   get_attr(Term, clp_term, singleton(variable(X))),
   get_attr(X, clp_term, terms_from(const(42))).
+
+test('is_singleton_term_-_+_already_constrained_v_c') :-
+  term_at_least(Term, X), 
+  is_singleton_term(Term, 42),
+  get_attr(Term, clp_term, singleton(const(42))),
+  get_attr(X, clp_term, terms_to(const(42))).
+
+test('is_singleton_term_-_+_already_constrained_v_v') :-
+  term_at_least(Term, X), 
+  is_singleton_term(Term, Y),
+  get_attr(Term, clp_term, singleton(variable(Y))),
+  get_attr(X, clp_term, terms_to(variable(Y))),
+  get_attr(Y, clp_term, terms_from(variable(X))).
+
+
 
 % TODO: keep going with these tests 
 
@@ -960,17 +976,34 @@ test('terms_dom_intersection_termsfrom_allterms') :-
 test('terms_dom_intersection_termsfrom_singleton_c_c') :-
   terms_dom_intersection(terms_from(const(1)), singleton(const(2)), singleton(const(2))).
 
+test('terms_dom_intersection_termsfrom_singleton_c_c_empty') :-
+  setof(I, terms_dom_intersection(terms_from(const(2)), singleton(const(1)), I), Ans),
+  Ans = [empty].
+
 test('terms_dom_intersection_termsfrom_singleton_c_v') :-
-  setof(X-I, terms_dom_intersection(terms_from(const(1)), singleton(variable(X)), I), Ans),
-  Ans = [X-empty, X-singleton(variable(X))].
+  setof(Y-I, terms_dom_intersection(terms_from(const(1)), singleton(variable(Y)), I), Ans),
+  Ans = [Y-singleton(variable(Y)), Y-empty].
+
+test('terms_dom_intersection_termsfrom_singleton_c_v_unifies') :-
+  terms_dom_intersection(terms_from(const(1)), singleton(variable(Y)), singleton(variable(Y))),
+  get_attr(Y, clp_term, terms_from(const(1))). 
 
 test('terms_dom_intersection_termsfrom_singleton_v_c') :-
   setof(I, terms_dom_intersection(terms_from(variable(_)), singleton(const(2)), I), Ans),
   Ans = [empty, singleton(const(2))].
 
+test('terms_dom_intersection_termsfrom_singleton_v_c_unifies') :-
+ terms_dom_intersection(terms_from(variable(X)), singleton(const(2)), singleton(const(2))),
+ get_attr(X, clp_term, terms_to(const(2))).
+
 test('terms_dom_intersection_termsfrom_singleton_v_v') :-
   setof(Y-I, terms_dom_intersection(terms_from(variable(_)), singleton(variable(Y)), I), Ans),
-  Ans = [Y-empty, Y-singleton(variable(Y))].
+  Ans = [Y-singleton(variable(Y)), Y-empty].
+
+test('terms_dom_intersection_termsfrom_singleton_v_v_attributes_x') :-
+  terms_dom_intersection(terms_from(variable(X)), singleton(variable(Y)), singleton(variable(Y))),
+  get_attr(X, clp_term, terms_to(variable(Y))),
+  get_attr(Y, clp_term, terms_from(variable(X))).
 
 test('terms_dom_intersection_termsfrom_termsfrom') :-
   setof(X-Y-FromFrom1, terms_dom_intersection(terms_from(variable(X)), terms_from(variable(Y)), FromFrom1), FromFrom1s),
@@ -990,17 +1023,34 @@ test('terms_dom_intersection_termsto_allterms') :-
 test('terms_dom_intersection_termsto_singleton_c_c') :-
   terms_dom_intersection(terms_to(const(2)), singleton(const(1)), singleton(const(1))).
 
+test('terms_dom_intersection_termsto_singleton_c_c_empty') :-
+  setof(I, terms_dom_intersection(terms_to(const(1)), singleton(const(2)), I), Ans),
+  Ans = [empty].
+
 test('terms_dom_intersection_termsto_singleton_c_v') :-
   setof(X-I, terms_dom_intersection(terms_to(const(1)), singleton(variable(X)), I), Ans),
-  Ans = [X-empty, X-singleton(variable(X))].
+  Ans = [X-singleton(variable(X)), X-empty].
+
+test('terms_dom_intersection_termsto_singleton_c_v_unifies') :-
+  terms_dom_intersection(terms_to(const(1)), singleton(variable(Y)), singleton(variable(Y))),
+  get_attr(Y, clp_term, terms_to(const(1))).
 
 test('terms_dom_intersection_termsto_singleton_v_c') :-
   setof(I, terms_dom_intersection(terms_to(variable(_)), singleton(const(1)), I), Ans),
   Ans = [empty, singleton(const(1))].
 
+test('terms_dom_intersection_termsto_singleton_v_c_unifies') :-
+  terms_dom_intersection(terms_to(variable(X)), singleton(const(1)), singleton(const(1))),
+  get_attr(X, clp_term, terms_from(const(1))).
+
 test('terms_dom_intersection_termsto_singleton_v_v') :-
   setof(I, terms_dom_intersection(terms_to(variable(_)), singleton(variable(Y)), I), Ans),
   Ans = [empty, singleton(variable(Y))].
+
+test('terms_dom_intersection_termsto_singleton_v_v_attributes_x') :-
+  terms_dom_intersection(terms_to(variable(X)), singleton(variable(Y)), singleton(variable(Y))),
+  get_attr(X, clp_term, terms_from(variable(Y))),
+  get_attr(Y, clp_term, terms_to(variable(X))).
 
 test('terms_dom_intersection_termsto_termsfrom') :-
   setof(X-Y-ToFrom1, terms_dom_intersection(terms_to(variable(X)), terms_from(variable(Y)), ToFrom1), ToFrom1s),
@@ -1020,33 +1070,68 @@ test('terms_dom_intersection_int_allterms') :-
 test('terms_dom_intersection_int_singleton_[c,c]_c') :-
   terms_dom_intersection([const(1), const(3)], singleton(const(2)), singleton(const(2))).
 
+test('terms_dom_intersection_int_singleton_[c,c]_c_empty') :-
+  setof(I, terms_dom_intersection([const(1), const(3)], singleton(const(4)), I), Ans),
+  Ans = [empty].
+
 test('terms_dom_intersection_int_singleton_[c,c]_v') :-
-  setof(Z-I, terms_dom_intersection([const(1), const(3)], singleton(variable(Z)), I), Ans),
-  Ans = [Z-empty, Z-singleton(variable(Z))].
+  setof(Y-I, terms_dom_intersection([const(1), const(3)], singleton(variable(Y)), I), Ans),
+  Ans = [Y-empty, Y-singleton(variable(Y))].
+
+test('terms_dom_intersection_int_singleton_[c,c]_v_attributes_x') :-
+  terms_dom_intersection([const(1), const(3)], singleton(variable(Y)), singleton(variable(Y))),
+  get_attr(Y, clp_term, [const(1), const(3)]).
 
 test('terms_dom_intersection_int_singleton_[c,v]_c') :-
   setof(I, terms_dom_intersection([const(1), variable(_)], singleton(const(3)), I), Ans),
   Ans = [empty, singleton(const(3))].
 
+test('terms_dom_intersection_int_singleton_[c,v]_c_attributes_x') :-
+  terms_dom_intersection([const(1), variable(Z)], singleton(const(3)), singleton(const(3))),
+  get_attr(Z, clp_term, terms_from(const(3))).
+
 test('terms_dom_intersection_int_singleton_[c,v]_v') :-
-  setof(Z-I, terms_dom_intersection([const(1), variable(_)], singleton(variable(Z)), I), Ans),
-  Ans = [Z-empty, Z-singleton(variable(Z))].
+  setof(Y-I, terms_dom_intersection([const(1), variable(_)], singleton(variable(Y)), I), Ans),
+  Ans = [Y-empty, Y-singleton(variable(Y))].
+
+test('terms_dom_intersection_int_singleton_[c,v]_v_attributes_x') :-
+  terms_dom_intersection([const(1), variable(Z)], singleton(variable(Y)), singleton(variable(Y))),
+  get_attr(Y, clp_term, [const(1), variable(Z)]),
+  get_attr(Z, clp_term, terms_from(variable(Y))).
 
 test('terms_dom_intersection_int_singleton_[v,c]_c') :-
   setof(I, terms_dom_intersection([variable(_), const(3)], singleton(const(1)), I), Ans),
   Ans = [empty, singleton(const(1))].
 
+test('terms_dom_intersection_int_singleton_[v,c]_c_attributes_x') :-
+  terms_dom_intersection([variable(X), const(3)], singleton(const(1)), singleton(const(1))),
+  get_attr(X, clp_term, terms_to(const(1))).
+
 test('terms_dom_intersection_int_singleton_[v,c]_v') :-
-  setof(Z-I, terms_dom_intersection([variable(_), const(3)], singleton(variable(Z)), I), Ans),
-  Ans = [Z-empty, Z-singleton(variable(Z))].
+  setof(Y-I, terms_dom_intersection([variable(_), const(3)], singleton(variable(Y)), I), Ans),
+  Ans = [Y-empty, Y-singleton(variable(Y))].
+
+test('terms_dom_intersection_int_singleton_[v,c]_v_attributes_x') :-
+  terms_dom_intersection([variable(X), const(3)], singleton(variable(Y)), singleton(variable(Y))),
+  get_attr(Y, clp_term, [variable(X), const(3)]),
+  get_attr(X, clp_term, terms_to(variable(Y))).
 
 test('terms_dom_intersection_int_singleton_[v,v]_c') :-
   setof(I, terms_dom_intersection([variable(_), variable(_)], singleton(const(2)), I), Ans),
   Ans = [empty, singleton(const(2))].
 
+test('terms_dom_intersection_int_singleton_[v,v]_c_attributes_x') :-
+  terms_dom_intersection([variable(X), variable(Z)], singleton(const(2)), singleton(const(2))),
+  get_attr(X, clp_term, terms_to(const(2))),
+  get_attr(Z, clp_term, terms_from(const(2))).
+
 test('terms_dom_intersection_int_singleton_[v,v]_v') :-
-  setof(Z-I, terms_dom_intersection([variable(_), variable(_)], singleton(variable(Z)), I), Ans),
-  Ans = [Z-empty, Z-singleton(variable(Z))].
+  setof(Y-I, terms_dom_intersection([variable(_), variable(_)], singleton(variable(Y)), I), Ans),
+  Ans = [Y-empty, Y-singleton(variable(Y))].
+
+test('terms_dom_intersection_int_singleton_[v,v]_v_attributes_x') :-
+  terms_dom_intersection([variable(X), variable(Z)], singleton(variable(Y)), singleton(variable(Y))),
+  get_attr(Y, clp_term, [variable(X), variable(Z)]).
 
 test('terms_dom_intersection_int_termsfrom') :-
   setof(X-Y-Z-IntFrom1, terms_dom_intersection([variable(X),variable(Y)], terms_from(variable(Z)), IntFrom1), IntFrom1s),
@@ -1065,6 +1150,10 @@ test('terms_dom_intersection_singleton_allterms') :-
 
 test('terms_dom_intersection_singleton_singleton_c_c') :-
   terms_dom_intersection(singleton(const(1)), singleton(const(1)), singleton(const(1))).
+
+test('terms_dom_intersection_singleton_singleton_c_c_empty') :-
+  setof(I, terms_dom_intersection(singleton(const(1)), singleton(const(2)), I), Ans),
+  Ans = [empty].
 
 test('terms_dom_intersection_singleton_singleton_c_v') :-
   setof(Y-I, terms_dom_intersection(singleton(const(1)), singleton(variable(Y)), I), Ans),

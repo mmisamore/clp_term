@@ -3,7 +3,7 @@
     term_at_most/2,
     is_term/1,
     is_empty_term/1,
-    is_singleton_term/1,
+    is_singleton_term/2,
     term_indomain/2,
     terms_dom_intersection/3
   ]).
@@ -43,7 +43,10 @@ is_empty_term(Term) :-
 %
 % True whenever `Term` can only be bound to a single possible value in the standard ordering of terms.
 is_singleton_term(Term, X) :-
-  fail. 
+  (  var(X)
+  -> term_indomain(Term, singleton(variable(X)))
+  ;  term_indomain(Term, singleton(const(X)))
+  ). 
 
 % term_at_least(-Term, +X) is det.
 % term_at_least(-Term, -X) is det.
@@ -337,6 +340,105 @@ terms_intersection_int_int([X, Y], [Z, W], Intersection) :-
       )
   ).
 
+% Helper predicate 
+terms_intersection_from_singleton(terms_from(X), singleton(Y), Intersection) :-
+  (  X = const(X1)
+  -> (  Y = const(Y1)
+     -> (  X1 @=< Y1
+        -> Intersection = singleton(Y) 
+        ;  Intersection = empty
+        )
+     ;  Y = variable(Y1)
+     -> ( Intersection = empty 
+        ; Intersection = singleton(Y), term_indomain(Y1, terms_from(X))
+        )
+     )
+  ; X = variable(X1)
+  ->  (  Y = const(_)
+      -> ( Intersection = empty
+         ; Intersection = singleton(Y), term_indomain(X1, terms_to(Y))
+         )
+      ;  Y = variable(Y1)
+      -> ( Intersection = empty
+         ; Intersection = singleton(Y), term_indomain(X1, terms_to(Y)), term_indomain(Y1, terms_from(X))
+         )
+      )
+  ).
+
+% Helper method
+terms_intersection_to_singleton(terms_to(X), singleton(Y), Intersection) :-
+  (  X = const(X1)
+  -> (  Y = const(Y1)
+     -> (  X1 @>= Y1 
+        -> Intersection = singleton(Y)
+        ;  Intersection = empty
+        )
+     ;  Y = variable(Y1)
+     -> ( Intersection = empty
+        ; Intersection = singleton(Y), term_indomain(Y1, terms_to(X))
+        )
+     )
+  ;  X = variable(X1)
+  -> (  Y = const(_)
+     -> ( Intersection = empty
+        ; Intersection = singleton(Y), term_indomain(X1, terms_from(Y))
+        )
+     ;  Y = variable(Y1)
+     -> ( Intersection = empty
+        ; Intersection = singleton(Y), term_indomain(Y1, terms_to(X)), term_indomain(X1, terms_from(Y))
+        )
+     )
+  ).
+
+% Helper method
+terms_intersection_int_singleton([X, Z], singleton(Y), Intersection) :-
+  (  X = const(X1)
+  -> (  Y = const(Y1)
+     -> (  Z = const(Z1)
+        -> (  X1 @=< Y1, Y1 @=< Z1
+           -> Intersection = singleton(Y)
+           ;  Intersection = empty
+           )
+        ;  Z = variable(Z1)
+        -> (  Intersection = empty
+           ;  Intersection = singleton(Y), term_indomain(Z1, terms_from(Y))
+           )
+        )
+     ;  Y = variable(Y1)
+     -> (  Z = const(_)
+        -> (  Intersection = empty
+           ;  Intersection = singleton(Y), term_indomain(Y1, [X, Z])
+           )
+        ;  Z = variable(Z1)
+        -> (  Intersection = empty
+           ;  Intersection = singleton(Y), term_indomain(Y1, [X, Z]), term_indomain(Z1, terms_from(Y))
+           )
+        )
+     )
+  ;  X = variable(X1)
+  -> (  Y = const(_)
+     -> (  Z = const(_)
+        -> ( Intersection = empty
+           ; Intersection = singleton(Y), term_indomain(X1, terms_to(Y))
+           )
+        ;  Z = variable(Z1)
+        -> ( Intersection = empty
+           ; Intersection = singleton(Y), term_indomain(X1, terms_to(Y)), term_indomain(Z1, terms_from(Y))
+           )
+        )
+     ;  Y = variable(Y1)
+     -> (  Z = const(_)
+        -> ( Intersection = empty
+           ; Intersection = singleton(Y), term_indomain(Y1, [X, Z]), term_indomain(X1, terms_to(Y))
+           )
+        ;  Z = variable(_)
+        -> ( Intersection = empty
+           ; Intersection = singleton(Y), term_indomain(Y1, [X, Z])
+           )
+        )
+     )
+  ).
+
 % terms_dom_intersection(+Dom1, +Dom2, -Intersection) is multi.
 %
 % Intersection of any two term domains for the standard ordering on terms. Domains are normalized
@@ -350,25 +452,19 @@ terms_dom_intersection(Dom1, Dom2, Intersection) :-
   -> Intersection = NewDom1
   ;  (NewDom1 == empty ; NewDom2 == empty)
   -> Intersection = empty
-  ;  NewDom2 = singleton(Y) % handle case when second domain is singleton
-  -> (  NewDom1 = terms_from(X)
-     -> (  X = const(X1), Y = const(Y1), X1 @=< Y1 
-        -> Intersection = singleton(Y)
-        ;  ( Intersection = singleton(Y) ; Intersection = empty )
-        )
-     ;  NewDom1 = terms_to(X)
-     -> (  X = const(X1), Y = const(Y1), X1 @>= Y1
-        -> Intersection = singleton(Y)
-        ;  ( Intersection = singleton(Y) ; Intersection = empty )
-        )
-     ;  NewDom1 = [X, Z]
-     -> (  X = const(X1), Z = const(Z1), Y = const(Y1), X1 @=< Y1, Y1 @=< Z1
-        -> Intersection = singleton(Y)
-        ;  ( Intersection = singleton(Y) ; Intersection = empty ) 
-        )
+  ;  NewDom2 = singleton(Y) 
+  -> (  NewDom1 = terms_from(_)
+     -> terms_intersection_from_singleton(NewDom1, NewDom2, Intersection)
+     ;  NewDom1 = terms_to(_)
+     -> terms_intersection_to_singleton(NewDom1, NewDom2, Intersection) 
+     ;  NewDom1 = [_, _]
+     -> terms_intersection_int_singleton(NewDom1, NewDom2, Intersection)
      ;  NewDom1 = singleton(X)
-     -> (  X = const(X1), Y = const(Y1), X1 = Y1
-        -> Intersection = singleton(X)
+     -> (  X = const(X1), Y = const(Y1)
+        -> (  X1 = Y1
+           -> Intersection = singleton(X)
+           ;  Intersection = empty
+           )
         ;  X = const(X1), Y = variable(Y1)
         -> ( Intersection = singleton(X), X1 = Y1 ; Intersection = empty )
         ;  X = variable(X1), Y = const(Y1)
