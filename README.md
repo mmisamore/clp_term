@@ -117,7 +117,7 @@ Intersection = [const(a), const(c)].
 Due to the presence of variable endpoints, some domain intersections will inevitably yield choicepoints as demanded by
 the semantics, e.g.:
 ```prolog
-% Z is forced to be a singleton equal to `a` in this case; or
+% Z is forced to be a singleton equal to `a`; or
 % Z is in the interval [a, Y]; or
 % Z is simply outside the interval, which is possible since Z is still unknown
 
