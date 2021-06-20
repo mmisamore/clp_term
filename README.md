@@ -49,7 +49,7 @@ X = b.
 ?- term_at_least(X, a), term_at_most(X, c), X = d.
 false.
 ```
-The constraints have been erased due to the unique solution in the first case.
+The constraints have been erased due to the unique solutions in these cases.
 
 Upon unification, the constraint intervals are intersected whenever applicable:
 ```prolog
