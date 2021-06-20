@@ -55,12 +55,15 @@ Upon unification, the constraint intervals are intersected whenever applicable:
 ```prolog
 ?- term_at_least(X, a), term_at_least(X, b).
 term_at_least(X, b).
+
 ?- term_at_least(X, a), term_at_most(X, c), term_at_least(Y, b), term_at_most(Y, d), X = Y.
 X = Y,
 term_at_least(Y, b),
 term_at_most(Y, c)
+
 ?- term_at_least(X, a), term_at_most(X, a).
 is_singleton_term(X, a).
+
 ?- term_at_least(X, b), term_at_most(X, a).
 is_empty_term(X).
 ```
@@ -114,19 +117,20 @@ Intersection = [const(a), const(c)].
 Due to the presence of variable endpoints, some domain intersections will inevitably yield choicepoints as demanded by
 the semantics, e.g.:
 ```prolog
+% Z is forced to be a singleton equal to `a` in this case; or
+% Z is in the interval [a, Y]; or
+% Z is simply outside the interval, which is possible since Z is still unknown
+
 ?- term_at_least(Z, X), term_at_most(Z, Y), X = a.
 X = Y, Y = a,
 is_singleton_term(Z, a) ;
-% Z is forced to be a singleton equal to `a` in this case; or
 
 X = a,
 term_at_least(Z, a),
 term_at_most(Z, Y) ;
-% Z is in the interval [a, Y]; or
 
 X = a,
 is_empty_term(Z).
-% Z is simply outside the interval, which is possible since Z is still unknown
 ```
 
 
