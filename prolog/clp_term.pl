@@ -365,7 +365,7 @@ terms_intersection_from_singleton(terms_from(X), singleton(Y), Intersection) :-
       )
   ).
 
-% Helper method
+% Helper predicate 
 terms_intersection_to_singleton(terms_to(X), singleton(Y), Intersection) :-
   (  X = const(X1)
   -> (  Y = const(Y1)
@@ -390,7 +390,7 @@ terms_intersection_to_singleton(terms_to(X), singleton(Y), Intersection) :-
      )
   ).
 
-% Helper method
+% Helper predicate 
 terms_intersection_int_singleton([X, Z], singleton(Y), Intersection) :-
   (  X = const(X1)
   -> (  Y = const(Y1)
@@ -439,6 +439,21 @@ terms_intersection_int_singleton([X, Z], singleton(Y), Intersection) :-
      )
   ).
 
+% Helper predicate
+terms_intersection_singleton_singleton(singleton(X), singleton(Y), Intersection) :-
+  (  X = const(X1), Y = const(Y1)
+  -> (  X1 = Y1
+     -> Intersection = singleton(X)
+     ;  Intersection = empty
+     )
+  ;  X = const(X1), Y = variable(Y1)
+  -> ( Intersection = singleton(X), X1 = Y1 ; Intersection = empty )
+  ;  X = variable(X1), Y = const(Y1)
+  -> ( Intersection = singleton(Y), X1 = Y1 ; Intersection = empty )
+  ;  X = variable(X1), Y = variable(Y1)
+  -> (  Intersection = singleton(X), X1 = Y1 ; Intersection = empty )
+  ).
+
 % terms_dom_intersection(+Dom1, +Dom2, -Intersection) is multi.
 %
 % Intersection of any two term domains for the standard ordering on terms. Domains are normalized
@@ -452,26 +467,15 @@ terms_dom_intersection(Dom1, Dom2, Intersection) :-
   -> Intersection = NewDom1
   ;  (NewDom1 == empty ; NewDom2 == empty)
   -> Intersection = empty
-  ;  NewDom2 = singleton(Y) 
+  ;  NewDom2 = singleton(_) 
   -> (  NewDom1 = terms_from(_)
      -> terms_intersection_from_singleton(NewDom1, NewDom2, Intersection)
      ;  NewDom1 = terms_to(_)
      -> terms_intersection_to_singleton(NewDom1, NewDom2, Intersection) 
      ;  NewDom1 = [_, _]
      -> terms_intersection_int_singleton(NewDom1, NewDom2, Intersection)
-     ;  NewDom1 = singleton(X)
-     -> (  X = const(X1), Y = const(Y1)
-        -> (  X1 = Y1
-           -> Intersection = singleton(X)
-           ;  Intersection = empty
-           )
-        ;  X = const(X1), Y = variable(Y1)
-        -> ( Intersection = singleton(X), X1 = Y1 ; Intersection = empty )
-        ;  X = variable(X1), Y = const(Y1)
-        -> ( Intersection = singleton(Y), X1 = Y1 ; Intersection = empty )
-        ;  X = variable(X1), Y = variable(Y1)
-        -> (  Intersection = singleton(X), X1 = Y1 ; Intersection = empty )
-        )
+     ;  NewDom1 = singleton(_)
+     -> terms_intersection_singleton_singleton(NewDom1, NewDom2, Intersection) 
      )
   ;  NewDom1 = singleton(_), member(NewDom2, [terms_from(_), terms_to(_), [_,_]])
   -> terms_dom_intersection(Dom2, Dom1, Intersection)
@@ -503,32 +507,33 @@ terms_dom_intersection(Dom1, Dom2, Intersection) :-
   
 % Hook for term unification in the new "clp_term" domain 
 attr_unify_hook(Dom1, Term2) :-
+  dom_normalized(Dom1, NewDom1),
   (  get_attr(Term2, clp_term, Dom2)        % Term2 is already attributed
-  -> terms_dom_intersection(Dom1, Dom2, NewDom),
-     (  NewDom == empty                     % Fail to unify if resulting domain is empty
+  -> terms_dom_intersection(NewDom1, Dom2, I),
+     (  I == empty                     % Fail to unify if resulting domain is empty
      -> fail
-     ;  NewDom = singleton(Value)           % New domain is a singleton, so delete attribute and unify normally 
+     ;  I = singleton(Value)           % New domain is a singleton, so delete attribute and unify normally 
      -> arg(1, Value, Value1),
         del_attr(Term2, clp_term),
         Term2 = Value1
-     ;  put_attr(Term2, clp_term, NewDom) % Otherwise, just set the new domain
+     ;  put_attr(Term2, clp_term, I)   % Otherwise, just set the new domain
      )
   ;  (  nonvar(Term2)
-     -> (  Dom1 == all_terms                % Term2 is not a variable, so check if it belongs to Dom1
+     -> (  NewDom1 == all_terms        % Term2 is not a variable, so check if it belongs to Dom1
         -> true 
-        ;  Dom1 = terms_from(X)             % Lower bound case
+        ;  NewDom1 = terms_from(X)     % Lower bound case
         -> (  X = const(X0)
            -> Term2 @>= X0
            ;  X = variable(X0)
            -> term_at_most(X0, Term2) 
            )
-        ;  Dom1 = terms_to(X)               % Upper bound case
+        ;  NewDom1 = terms_to(X)       % Upper bound case
         -> (  X = const(X0) 
            -> Term2 @=< X0
            ;  X = variable(X0)
            -> term_at_least(X0, Term2)
            )
-        ;  Dom1 = [X, Y]                    % Interval case
+        ;  NewDom1 = [X, Y]            % Interval case
         -> (  X = const(X0)
            -> (  Y = const(Y0)
               -> Term2 @>= X0, Term2 @=< Y0
